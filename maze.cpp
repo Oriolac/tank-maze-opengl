@@ -1,6 +1,6 @@
 #include <cstdio>
 #include <cstdlib>
-#include "prim.cpp"
+#include "kruskal.cpp"
 
 #define DEFAULT_ROWS 20
 #define DEFAULT_COLS 20
@@ -26,8 +26,9 @@ int main(int argc, char **argv) {
         return 0;
     }
     Dimensions dimensions = getDimensions(argc, argv);
-    Graph graph = Graph(3, 2);
-    graph.print_adjacency();
+    Graph graph = createLaberinthWithKrukal(dimensions.cols, dimensions.rows);
+    graph.kruskal();
+    graph.print();
 }
 
 int getLongFromStr(char *const *argv, int pos) {
