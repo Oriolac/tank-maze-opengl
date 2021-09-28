@@ -154,7 +154,8 @@ void Graph::checkCanBePath(const pair<int, int> &edgePath, const pair<int, int> 
         return;
     int checkPos = toPosition(newX, newY);
     printf("Coord(%d, %d) checking Pos(%d, %d)=%d\n", coords1->first, coords1->second, newX, newY, checkPos);
-    if (checkPos != edgePath.first && checkPos != edgePath.second && !contains(walls, checkPos) && !contains(paths, checkPos)) {
+    if (checkPos != edgePath.first && checkPos != edgePath.second && !contains(walls, checkPos) &&
+        !contains(paths, checkPos)) {
         if (!canBePath(checkPos)) {
             walls.insert(checkPos);
         }
