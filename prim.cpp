@@ -1,16 +1,16 @@
 #include <iostream>
 #include <vector>
+#include <algorithm>
 
-using namespace std;
 #define INF 9999999
 
-vector<int> returnVector(int n, int i);
+std::vector<int> returnVector(int n, int i);
 
 bool isAway(int i, int j);
 
 class Graph {
 private:
-    vector<vector<int>> adjacency;
+    std::vector<std::vector<int>> adjacency;
     const int N;
     const int xDim;
     const int yDim;
@@ -31,15 +31,15 @@ public:
         }
     }
 
-    [[nodiscard]] bool isAround(int i, int j) const {
-        bool isVerticallyAround =  i == j + xDim || i == j - xDim;
+    bool isAround(int i, int j) const {
+        bool isVerticallyAround = i == j + xDim || i == j - xDim;
         bool isHorizontallyAround = false;
         if (i / yDim == j / yDim)
             isHorizontallyAround = i == j + 1 || i == j - 1;
         return isVerticallyAround or isHorizontallyAround;
     }
 
-    [[nodiscard]] vector<int> returnVector(int n, int i) const {
+    std::vector<int> returnVector(int n, int i) const {
         int tmpArray[n];
         for (int j = 0; j < n; j++) {
             int tmp;
@@ -51,5 +51,17 @@ public:
         }
         return {tmpArray, tmpArray + sizeof tmpArray / sizeof tmpArray[0]};
     }
+
+    void kruskal() {
+        int uRep, vRep;
+        sort(this->adjacency.begin(), this->adjacency.end());
+        for (int i = 0; i < adjacency.size(); i++) {
+        }
+    }
+
 };
+
+int start() {
+
+}
 
