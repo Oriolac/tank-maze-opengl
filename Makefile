@@ -1,6 +1,6 @@
 
 all: compile
-	./maze a b
+	./maze 4 3
 
 compile: maze.cpp
 	gcc maze.cpp -o maze -lglut -lGLU -lGL -lm -lstdc++
@@ -19,3 +19,7 @@ prim: compile-prim
 
 compile-prim: prim.cpp
 	gcc prim.cpp -o prim -lstdc++
+
+test: test.cpp
+	gcc test.cpp -o test -lstdc++
+	./test

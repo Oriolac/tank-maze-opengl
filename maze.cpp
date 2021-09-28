@@ -26,13 +26,16 @@ int main(int argc, char **argv) {
         return 0;
     }
     Dimensions dimensions = getDimensions(argc, argv);
+    printf("Dimensions(%d, %d)\n", dimensions.cols, dimensions.rows);
     Graph graph = createLaberinthWithKrukal(dimensions.cols, dimensions.rows);
     graph.kruskal();
     graph.print();
 }
 
 int getLongFromStr(char *const *argv, int pos) {
+    printf("%s", argv[pos]);
     int res = (int) strtol(argv[pos], nullptr, 10);
+    printf("%d\n", res);
     return res == 0 ? DEFAULT_ROWS : res;
 }
 
@@ -42,8 +45,8 @@ Dimensions getDimensions(int argc, char **argv) {
         rows = DEFAULT_ROWS;
         cols = DEFAULT_COLS;
     } else {
-        rows = getLongFromStr(argv, 1);
-        cols = getLongFromStr(argv, 2);
+        cols = getLongFromStr(argv, 1);
+        rows = getLongFromStr(argv, 2);
     }
     return {rows, cols};
 }
