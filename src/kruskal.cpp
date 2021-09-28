@@ -108,7 +108,9 @@ void Graph::kruskal() {
             continue;
         uRep = find_set(current_edge.first);
         vRep = find_set(current_edge.second);
+        printf("p(%i, %i)\n", current_edge.first, current_edge.second);
         if (uRep != vRep) {
+            printf("\tAdded\n");
             result_graph.push_back(initial_graph[i]);
             paths.insert(current_edge.first);
             paths.insert(current_edge.second);
@@ -128,31 +130,31 @@ void Graph::print() {
     }
 }
 
-void Graph::printMaze(){
-    char map[rows+2][cols+2];
-    for (int pos : paths) {
+void Graph::printMaze() {
+    char map[rows + 2][cols + 2];
+    for (int pos: paths) {
         pair<int, int> *coord = toCoordinates(pos);
-        map[coord->second+1][coord->first+1] = PATH_CHAR;
+        map[coord->second + 1][coord->first + 1] = PATH_CHAR;
     }
-    for (int pos : walls) {
+    for (int pos: walls) {
         pair<int, int> *coord = toCoordinates(pos);
-        map[coord->second+1][coord->first+1] = WALL_CHAR;
+        map[coord->second + 1][coord->first + 1] = WALL_CHAR;
     }
-    for (int i = 0; i < cols + 2; i++){
+    for (int i = 0; i < cols + 2; i++) {
         map[0][i] = WALL_CHAR;
     }
-    for (int i = 0; i < cols + 2; i++){
-        map[rows+1][i] = WALL_CHAR;
+    for (int i = 0; i < cols + 2; i++) {
+        map[cols + 1][i] = WALL_CHAR;
     }
-    for (int i = 0; i < rows + 2; i++){
+    for (int i = 0; i < rows + 2; i++) {
         map[i][0] = WALL_CHAR;
     }
-    for (int i = 0; i < rows + 2; i++){
-        map[i][cols+1] = WALL_CHAR;
+    for (int i = 0; i < rows + 2; i++) {
+        map[i][rows + 1] = WALL_CHAR;
     }
-    for(int i = 0; i < rows+2; i++){
-        for (int j = 0; j < cols+2; j++){
-            printf("%c", map[i][j]);
+    for (int i = 0; i < rows + 2; i++) {
+        for (int j = 0; j < cols + 2; j++) {
+            printf("%c", map[j][i]);
         }
         printf("\n");
     }
@@ -183,16 +185,15 @@ void Graph::checkAroundNewPath(edge &edgePath) {
 void Graph::checkCanBePath(const pair<int, int> &edgePath, const pair<int, int> *coords1, int i, int j) {
     int newX = coords1->first + i;
     int newY = coords1->second + j;
-    if (newX < 0 || newX >= cols)
-        return;
-    if (newY < 0 || newY >= rows)
-        return;
     int checkPos = toPosition(newX, newY);
-    if (checkPos != edgePath.first && checkPos != edgePath.second && !contains(walls, checkPos) &&
-        !contains(paths, checkPos)) {
-        if (!canBePath(checkPos)) {
-            printf("Added to walls: %i(%i, %i)\n", checkPos, newX, newY);
-            walls.insert(checkPos);
+    if (checkPos == -1)
+        return;
+    if (checkPos != edgePath.first && checkPos != edgePath.second) {
+        if (!contains(walls, checkPos) && !contains(paths, checkPos)) {
+            if (!canBePath(checkPos)) {
+                printf("Added to walls: %i(%i, %i)\n", checkPos, newX, newY);
+                walls.insert(checkPos);
+            }
         }
     }
 }
@@ -206,10 +207,11 @@ bool Graph::canBePath(int pos1) {
     vector<int> horizontals = vector<int>(2);
     verticals.push_back(GO_LEFT);
     verticals.push_back(GO_RIGHT);
-    for (int &i: verticals) {
-        for (int &j: horizontals) {
-            if (hasCornerPath(coordsVal->first, coordsVal->second, i, j)){}
+    for (int i = -1; i < 1; i++) {
+        for (int j = -1; j < 1; j++) {
+            if (i != 0 && j != 0 && hasCornerPath(coordsVal->first, coordsVal->second, i, j)) {
                 return false;
+            }
         }
     }
     return res;
@@ -221,6 +223,8 @@ bool Graph::hasCornerPath(int x, int y, int vert, int horiz) {
     int pos1 = toPosition(x, transY);
     int pos2 = toPosition(transX, y);
     int pos3 = toPosition(transX, transY);
+    printf("(%i, %i) + (%i, %i) = (%i, %i) -> (%i/%i %i/%i %i/%i)\n", x, y, horiz, vert, transX, transY, pos1,
+           contains(paths, pos1), pos2, contains(paths, pos2), pos3, contains(paths, pos3));
     return contains(paths, pos1) && contains(paths, pos2) && contains(paths, pos3);
 }
 
