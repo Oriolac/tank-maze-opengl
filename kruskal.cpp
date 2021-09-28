@@ -13,8 +13,7 @@ using namespace std;
 #define GO_RIGHT (+ 1)
 
 
-bool isAround(int i, int j, int cols, int rows);
-
+bool isAround(int pos1, int pos2, int cols);
 
 class Graph {
 private:
@@ -24,7 +23,6 @@ private:
     set<int> paths;
     int cols;
     int rows;
-
     int *parent;
     int V;  // number of vertices/nodes in graph
 public:
@@ -103,7 +101,6 @@ void Graph::kruskal() {
             continue;
         uRep = find_set(current_edge.first);
         vRep = find_set(current_edge.second);
-        printf("%i-%i:: uRep: %i, vRep %i\n", current_edge.first, current_edge.second, uRep, vRep);
         if (uRep != vRep) {
             result_graph.push_back(initial_graph[i]);
             paths.insert(current_edge.first);
@@ -153,10 +150,10 @@ void Graph::checkCanBePath(const pair<int, int> &edgePath, const pair<int, int> 
     if (newY < 0 || newY >= rows)
         return;
     int checkPos = toPosition(newX, newY);
-    printf("Coord(%d, %d) checking Pos(%d, %d)=%d\n", coords1->first, coords1->second, newX, newY, checkPos);
     if (checkPos != edgePath.first && checkPos != edgePath.second && !contains(walls, checkPos) &&
         !contains(paths, checkPos)) {
         if (!canBePath(checkPos)) {
+            printf("Added to walls: %i(%i, %i)\n", checkPos, newX, newY);
             walls.insert(checkPos);
         }
     }
@@ -173,7 +170,7 @@ bool Graph::canBePath(int pos1) {
     verticals.push_back(GO_RIGHT);
     for (int &i: verticals) {
         for (int &j: horizontals) {
-            if (hasCornerPath(coordsVal->first, coordsVal->second, i, j))
+            if (hasCornerPath(coordsVal->first, coordsVal->second, i, j)){}
                 return false;
         }
     }
@@ -216,7 +213,7 @@ Graph createLaberinthWithKrukal(int cols, int rows) {
     srand(time(nullptr));
     for (int i = 0; i < N; i++) {
         for (int j = 0; j < N; j++) {
-            if (isAround(i, j, cols, rows)) {
+            if (isAround(i, j, cols)) {
                 int weight_edge = rand() % 5 + 2;
                 g.addWeightedEdge(i, j, weight_edge);
             }
@@ -228,7 +225,7 @@ Graph createLaberinthWithKrukal(int cols, int rows) {
     return g;
 }
 
-bool isAround(int pos1, int pos2, int cols, int rows) {
+bool isAround(int pos1, int pos2, int cols) {
     bool isVerticallyAround = pos1 == (pos2 + cols) || pos1 == (pos2 - cols);
     bool isHorizontallyAround = false;
     if (pos1 / cols == pos2 / cols)
