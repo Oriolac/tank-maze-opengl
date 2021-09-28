@@ -1,25 +1,25 @@
 
 all: compile
-	./maze 5 5
+	./comp/maze 5 5
 
-compile: maze.cpp
-	gcc maze.cpp -o maze -lglut -lGLU -lGL -lm -lstdc++
+compile: src/maze.cpp
+	gcc ./src/maze.cpp -o ./comp/maze -lglut -lGLU -lGL -lm -lstdc++
 
 clean:
-	rm maze
+	rm ./src/maze
 
 kruskal: compile-kruskal
-	./kruskal
+	./comp/kruskal
 
-compile-kruskal: kruskal.cpp
-	gcc kruskal.cpp -o kruskal -lstdc++
+compile-kruskal: src/kruskal.cpp
+	gcc ./src/kruskal.cpp -o ./comp/kruskal -lstdc++
 
 prim: compile-prim
-	./prim
+	./comp/prim
 
-compile-prim: prim.cpp
-	gcc prim.cpp -o prim -lstdc++
+compile-prim: src/prim.cpp
+	gcc ./src/prim.cpp -o ./comp/prim -lstdc++
 
-test: test.cpp
-	gcc test.cpp -o test -lstdc++
-	./test
+test: tests/test.cpp
+	gcc ./tests/test.cpp -o ./tests/comp/test -lstdc++
+	./tests/test
