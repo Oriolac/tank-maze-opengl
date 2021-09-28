@@ -1,4 +1,4 @@
-#include "kruskal.cpp"
+#include "../src/kruskal.cpp"
 
 using namespace std;
 
