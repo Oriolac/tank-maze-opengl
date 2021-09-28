@@ -29,7 +29,7 @@ int main(int argc, char **argv) {
     printf("Dimensions(%d, %d)\n", dimensions.cols, dimensions.rows);
     Graph graph = createLaberinthWithKrukal(dimensions.cols, dimensions.rows);
     graph.kruskal();
-    graph.print();
+    graph.printMaze();
 }
 
 int getLongFromStr(char *const *argv, int pos) {

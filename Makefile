@@ -1,6 +1,6 @@
 
 all: compile
-	./maze 3 3
+	./maze 5 5
 
 compile: maze.cpp
 	gcc maze.cpp -o maze -lglut -lGLU -lGL -lm -lstdc++

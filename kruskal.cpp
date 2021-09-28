@@ -2,6 +2,7 @@
 #include <iostream>
 #include <vector>
 #include <set>
+#include <tkInt.h>
 
 using namespace std;
 
@@ -12,6 +13,10 @@ using namespace std;
 #define GO_LEFT (- 1)
 #define GO_RIGHT (+ 1)
 
+
+#define PATH_CHAR ' '
+
+#define WALL_CHAR 'X'
 
 bool isAround(int i, int j, int cols, int rows);
 
@@ -55,6 +60,9 @@ public:
     bool hasCornerPath(int x, int y, int i, int i1);
 
     static bool contains(set<int> set1, int pos1);
+
+    void printMaze();
+
 };
 
 Graph::Graph(int cols, int rows) {
@@ -123,6 +131,37 @@ void Graph::print() {
         cout << endl;
     }
 }
+
+void Graph::printMaze(){
+    char map[rows+2][cols+2];
+    for (int pos : paths) {
+        pair<int, int> *coord = toCoordinates(pos);
+        map[coord->second+1][coord->first+1] = PATH_CHAR;
+    }
+    for (int pos : walls) {
+        pair<int, int> *coord = toCoordinates(pos);
+        map[coord->second+1][coord->first+1] = WALL_CHAR;
+    }
+    for (int i = 0; i < cols + 2; i++){
+        map[0][i] = WALL_CHAR;
+    }
+    for (int i = 0; i < cols + 2; i++){
+        map[rows+1][i] = WALL_CHAR;
+    }
+    for (int i = 0; i < rows + 2; i++){
+        map[i][0] = WALL_CHAR;
+    }
+    for (int i = 0; i < rows + 2; i++){
+        map[i][cols+1] = WALL_CHAR;
+    }
+    for(int i = 0; i < rows+2; i++){
+        for (int j = 0; j < cols+2; j++){
+            printf("%c", map[i][j]);
+        }
+        printf("\n");
+    }
+}
+
 
 coords *Graph::toCoordinates(int position) const {
     return new coords(position / cols, position % cols);
