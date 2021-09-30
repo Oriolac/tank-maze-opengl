@@ -60,7 +60,10 @@ public:
 
     void printMaze();
 
+    void addWall(int i);
 };
+
+Graph &initInnerWalls(int cols, Graph &g, int N);
 
 Graph::Graph(int cols, int rows) {
     V = cols * rows;
@@ -108,7 +111,7 @@ void Graph::kruskal() {
             continue;
         uRep = find_set(current_edge.first);
         vRep = find_set(current_edge.second);
-        printf("p(%i, %i)\n", current_edge.first, current_edge.second);
+        printf("p(%i, %i): %i-%i\n", current_edge.first, current_edge.second, uRep, vRep);
         if (uRep != vRep) {
             printf("\tAdded\n");
             result_graph.push_back(initial_graph[i]);
@@ -131,29 +134,17 @@ void Graph::print() {
 }
 
 void Graph::printMaze() {
-    char map[rows + 2][cols + 2];
+    char map[rows][cols];
     for (int pos: paths) {
         pair<int, int> *coord = toCoordinates(pos);
-        map[coord->second + 1][coord->first + 1] = PATH_CHAR;
+        map[coord->second][coord->first] = PATH_CHAR;
     }
     for (int pos: walls) {
         pair<int, int> *coord = toCoordinates(pos);
-        map[coord->second + 1][coord->first + 1] = WALL_CHAR;
+        map[coord->second][coord->first] = WALL_CHAR;
     }
-    for (int i = 0; i < cols + 2; i++) {
-        map[0][i] = WALL_CHAR;
-    }
-    for (int i = 0; i < cols + 2; i++) {
-        map[cols + 1][i] = WALL_CHAR;
-    }
-    for (int i = 0; i < rows + 2; i++) {
-        map[i][0] = WALL_CHAR;
-    }
-    for (int i = 0; i < rows + 2; i++) {
-        map[i][rows + 1] = WALL_CHAR;
-    }
-    for (int i = 0; i < rows + 2; i++) {
-        for (int j = 0; j < cols + 2; j++) {
+    for (int i = 0; i < rows; i++) {
+        for (int j = 0; j < cols; j++) {
             printf("%c", map[j][i]);
         }
         printf("\n");
@@ -232,6 +223,10 @@ bool Graph::contains(set<int> set1, int el) {
     return set1.find(el) != set1.end();
 }
 
+void Graph::addWall(int i) {
+    walls.insert(i);
+}
+
 void addInitialEdges(int point, int point2, int point3, Graph &g) {
     int randNum = rand() % 3;
     switch (randNum) {
@@ -250,17 +245,33 @@ void addInitialEdges(int point, int point2, int point3, Graph &g) {
 }
 
 Graph createLaberinthWithKrukal(int cols, int rows) {
+    cols = cols+2;
+    rows = rows+2;
     Graph g(cols, rows);
     int N = cols * rows;
+    for (int i = 0; i < cols; i++) {
+        g.addWall(i);
+        g.addWall(i + cols * (rows-1));
+    }
+    for (int i = 0; i < rows; i++) {
+        g.addWall(i * cols);
+        g.addWall(i * cols + (cols-1));
+    }
     srand(time(nullptr));
-    for (int i = 0; i < N; i++) {
-        for (int j = 0; j < N; j++) {
+    g = initInnerWalls(cols, g, N);
+    return g;
+}
+
+Graph &initInnerWalls(int cols, Graph &g, int N) {
+    for (int i = 1; i < N - 1; i++) {
+        for (int j = 1; j < N-1; j++) {
             if (isAround(i, j, cols)) {
                 int weight_edge = rand() % 5 + 2;
                 g.addWeightedEdge(i, j, weight_edge);
             }
         }
     }
+
     int lastPoint = N - 1;
     addInitialEdges(0, cols, 1, g);
     addInitialEdges(lastPoint, lastPoint - 1, lastPoint - cols, g);

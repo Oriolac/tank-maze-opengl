@@ -2,7 +2,7 @@
 
 using namespace std;
 
-#define assertEquals(x, y) if((x) != (y)) {std::cout << "Failed: " << __FUNCTION__ << " in line " << __LINE__ << "\n\tExpected: " << (x) << " Actual: " << y << "\n"; return -1;}
+#define assertEquals(x, y) if((x) != (y)) {std::cout << "Failed: " << __FUNCTION__ << " in line " << __LINE__ << "\n\tExpected: " << (x) << " Actual: " << (y) << "\n"; return -1;}
 #define ADD(x) if (x() == -1) {std::cout << "FAIL\n"; return -1;}
 #define TEST(x) int x()
 
