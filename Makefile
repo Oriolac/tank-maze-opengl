@@ -1,9 +1,9 @@
 
 all: compile
-	./comp/maze 40 20
+	./comp/game 4 4
 
-compile: src/maze.cpp
-	gcc ./src/maze.cpp -o ./comp/maze -lglut -lGLU -lGL -lm -lstdc++
+compile: src/game.cpp
+	gcc ./src/game.cpp -o ./comp/game -lglut -lGLU -lGL -lm -lstdc++
 
 clean:
 	rm ./src/maze
@@ -13,12 +13,6 @@ kruskal: compile-kruskal
 
 compile-kruskal: src/kruskal.cpp
 	gcc ./src/kruskal.cpp -o ./comp/kruskal -lstdc++
-
-prim: compile-prim
-	./comp/prim
-
-compile-prim: src/prim.cpp
-	gcc ./src/prim.cpp -o ./comp/prim -lstdc++
 
 test: tests/test.cpp
 	gcc ./tests/test.cpp -o ./tests/comp/test -lstdc++

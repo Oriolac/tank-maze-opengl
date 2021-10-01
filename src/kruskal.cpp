@@ -2,11 +2,10 @@
 #include <iostream>
 #include <vector>
 #include <set>
+#include "kruskal.h"
 
 using namespace std;
 
-#define edge pair<int, int>
-#define coords pair<int, int>
 #define GO_UP (- 1)
 #define GO_DOWN (+ 1)
 #define GO_LEFT (- 1)
@@ -19,70 +18,6 @@ bool isAround(int pos1, int pos2, int cols);
 #define PATH_CHAR ' '
 
 #define WALL_CHAR 'X'
-
-class Graph {
-private:
-    vector<pair<int, edge>> initial_graph;
-    vector<pair<int, edge>> result_graph;  // mst
-    set<int> walls;
-    set<int> paths;
-    int cols;
-    int rows;
-    int *parent;
-    int V;  // number of vertices/nodes in graph
-public:
-    Graph(int cols, int rows);
-
-    void addWeightedEdge(int u, int v, int w);
-
-    int find_set(int i);
-
-    void union_set(int u, int v);
-
-    void kruskal();
-
-    void printResult();
-
-    bool edgeHasWalls(pair<int, int> edge_val);
-
-    void checkAroundNewPath(pair<int, int> &edgePath);
-
-    coords *toCoordinates(int position) const;
-
-    int toPosition(int x, int y) const;
-
-    bool canBePath(int pos1);
-
-    void checkCanBePath(const pair<int, int> &edgePath, const pair<int, int> *coords1, int i, int j);
-
-    bool hasCornerPath(int x, int y, int i, int i1);
-
-    static bool contains(set<int> set1, int pos1);
-
-    void printMaze();
-
-    void addWall(int i);
-
-    void printInitial();
-
-    bool isAround(int pos1, int pos2);
-
-    bool isWall(int i);
-
-    void addPath(int i);
-
-    void checkArroundTilePath(const pair<int, int> &edgePath, const pair<int, int> *coords1);
-
-    bool canFormASquare(pair<int, int> &pair);
-
-    bool canFormASquareHorizontally(int first, int second);
-
-    bool isPath(int i);
-
-    bool canFormASquareHorizontally(const pair<int, int> *aCoords, const pair<int, int> *bCoords, int i);
-
-    bool canFormASquareVertically(pair<int, int> *pPair, pair<int, int> *pPair1, int i);
-};
 
 Graph &initInnerWalls(int cols, Graph &g, int N);
 
