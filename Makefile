@@ -1,6 +1,6 @@
 
 all: compile
-	./comp/maze 2 3
+	./comp/maze 40 20
 
 compile: src/maze.cpp
 	gcc ./src/maze.cpp -o ./comp/maze -lglut -lGLU -lGL -lm -lstdc++
@@ -22,4 +22,4 @@ compile-prim: src/prim.cpp
 
 test: tests/test.cpp
 	gcc ./tests/test.cpp -o ./tests/comp/test -lstdc++
-	./tests/test
+	./tests/comp/test

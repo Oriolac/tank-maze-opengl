@@ -26,7 +26,7 @@ int main(int argc, char **argv) {
         return 0;
     }
     Dimensions dimensions = getDimensions(argc, argv);
-    Graph graph = createLaberinthWithKrukal(dimensions.cols, dimensions.rows);
+    Graph graph = createLaberinthWithKruskal(dimensions.cols, dimensions.rows);
     graph.kruskal();
     graph.printMaze();
 }

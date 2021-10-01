@@ -11,7 +11,8 @@ using namespace std;
 #define GO_DOWN (+ 1)
 #define GO_LEFT (- 1)
 #define GO_RIGHT (+ 1)
-
+#define DEBUG 0
+#define debug_print(args ...) if (DEBUG) printf(args)
 
 bool isAround(int pos1, int pos2, int cols);
 
@@ -40,7 +41,7 @@ public:
 
     void kruskal();
 
-    void print();
+    void printResult();
 
     bool edgeHasWalls(pair<int, int> edge_val);
 
@@ -61,9 +62,31 @@ public:
     void printMaze();
 
     void addWall(int i);
+
+    void printInitial();
+
+    bool isAround(int pos1, int pos2);
+
+    bool isWall(int i);
+
+    void addPath(int i);
+
+    void checkArroundTilePath(const pair<int, int> &edgePath, const pair<int, int> *coords1);
+
+    bool canFormASquare(pair<int, int> &pair);
+
+    bool canFormASquareHorizontally(int first, int second);
+
+    bool isPath(int i);
+
+    bool canFormASquareHorizontally(const pair<int, int> *aCoords, const pair<int, int> *bCoords, int i);
+
+    bool canFormASquareVertically(pair<int, int> *pPair, pair<int, int> *pPair1, int i);
 };
 
 Graph &initInnerWalls(int cols, Graph &g, int N);
+
+void initOuterWalls(int cols, int rows, Graph &g);
 
 Graph::Graph(int cols, int rows) {
     V = cols * rows;
@@ -107,13 +130,13 @@ void Graph::kruskal() {
     sort(initial_graph.begin(), initial_graph.end());
     for (i = 0; i < initial_graph.size(); i++) {
         edge &current_edge = initial_graph[i].second;
-        if (edgeHasWalls(current_edge))
+        if (edgeHasWalls(current_edge) || canFormASquare(current_edge))
             continue;
         uRep = find_set(current_edge.first);
         vRep = find_set(current_edge.second);
-        printf("p(%i, %i): %i-%i\n", current_edge.first, current_edge.second, uRep, vRep);
+        debug_print("p(%i, %i): %i-%i\n", current_edge.first, current_edge.second, uRep, vRep);
         if (uRep != vRep) {
-            printf("\tAdded\n");
+            debug_print("\tAdded\n");
             result_graph.push_back(initial_graph[i]);
             paths.insert(current_edge.first);
             paths.insert(current_edge.second);
@@ -121,12 +144,26 @@ void Graph::kruskal() {
             union_set(uRep, vRep);
         }
     }
+    for (i = 0; i < this->V; i++) {
+        if (!isPath(i) && !isWall(i))
+            this->addWall(i);
+    }
 }
 
-void Graph::print() {
+void Graph::printResult() {
     cout << "Edge :"
          << " Weight" << endl;
     for (auto &i: result_graph) {
+        cout << i.second.first << " - " << i.second.second << " : "
+             << i.first;
+        cout << endl;
+    }
+}
+
+void Graph::printInitial() {
+    cout << "Edge :"
+         << " Weight" << endl;
+    for (auto &i: initial_graph) {
         cout << i.second.first << " - " << i.second.second << " : "
              << i.first;
         cout << endl;
@@ -145,7 +182,7 @@ void Graph::printMaze() {
     }
     for (int i = 0; i < rows; i++) {
         for (int j = 0; j < cols; j++) {
-            printf("%c", map[j][i]);
+            printf("%c", map[i][j]);
         }
         printf("\n");
     }
@@ -153,7 +190,7 @@ void Graph::printMaze() {
 
 
 coords *Graph::toCoordinates(int position) const {
-    return new coords(position / cols, position % cols);
+    return new coords(position % cols, position / cols);
 }
 
 int Graph::toPosition(int x, int y) const {
@@ -165,10 +202,14 @@ int Graph::toPosition(int x, int y) const {
 void Graph::checkAroundNewPath(edge &edgePath) {
     pair<int, int> *coords1 = toCoordinates(edgePath.first);
     pair<int, int> *coords2 = toCoordinates(edgePath.second);
+    checkArroundTilePath(edgePath, coords1);
+    checkArroundTilePath(edgePath, coords2);
+}
+
+void Graph::checkArroundTilePath(const pair<int, int> &edgePath, const pair<int, int> *coords1) {
     for (int i = GO_LEFT; i <= GO_RIGHT; i++) {
         for (int j = GO_UP; j <= GO_DOWN; j++) {
             checkCanBePath(edgePath, coords1, i, j);
-            checkCanBePath(edgePath, coords2, i, j);
         }
     }
 }
@@ -179,10 +220,11 @@ void Graph::checkCanBePath(const pair<int, int> &edgePath, const pair<int, int> 
     int checkPos = toPosition(newX, newY);
     if (checkPos == -1)
         return;
+    debug_print("\tChecking p(%i, %i)=%i\n", newX, newY, checkPos);
     if (checkPos != edgePath.first && checkPos != edgePath.second) {
         if (!contains(walls, checkPos) && !contains(paths, checkPos)) {
             if (!canBePath(checkPos)) {
-                printf("Added to walls: %i(%i, %i)\n", checkPos, newX, newY);
+                debug_print("Added to walls: %i(%i, %i)\n", checkPos, newX, newY);
                 walls.insert(checkPos);
             }
         }
@@ -198,8 +240,8 @@ bool Graph::canBePath(int pos1) {
     vector<int> horizontals = vector<int>(2);
     verticals.push_back(GO_LEFT);
     verticals.push_back(GO_RIGHT);
-    for (int i = -1; i < 1; i++) {
-        for (int j = -1; j < 1; j++) {
+    for (int i = -1; i < 2; i++) {
+        for (int j = -1; j < 2; j++) {
             if (i != 0 && j != 0 && hasCornerPath(coordsVal->first, coordsVal->second, i, j)) {
                 return false;
             }
@@ -214,8 +256,8 @@ bool Graph::hasCornerPath(int x, int y, int vert, int horiz) {
     int pos1 = toPosition(x, transY);
     int pos2 = toPosition(transX, y);
     int pos3 = toPosition(transX, transY);
-    printf("(%i, %i) + (%i, %i) = (%i, %i) -> (%i/%i %i/%i %i/%i)\n", x, y, horiz, vert, transX, transY, pos1,
-           contains(paths, pos1), pos2, contains(paths, pos2), pos3, contains(paths, pos3));
+    debug_print("\t\t(%i, %i) + (%i, %i) = (%i, %i) -> (%i/%s %i/%s %i/%s)\n", x, y, horiz, vert, transX, transY, pos1,
+           contains(paths, pos1)?"true":"false", pos2, contains(paths, pos2)?"true":"false", pos3, contains(paths, pos3)?"true":"false");
     return contains(paths, pos1) && contains(paths, pos2) && contains(paths, pos3);
 }
 
@@ -228,62 +270,102 @@ void Graph::addWall(int i) {
 }
 
 void addInitialEdges(int point, int point2, int point3, Graph &g) {
-    int randNum = rand() % 3;
+    int randNum = rand() % 2;
     switch (randNum) {
-        case 2:
-            g.addWeightedEdge(point, point2, 1);
-            g.addWeightedEdge(point2, point, 1);
         case 1:
-            g.addWeightedEdge(point, point3, 1);
-            g.addWeightedEdge(point3, point, 1);
+            if (!g.isWall(point3)) {
+                g.addWeightedEdge(point, point3, 1);
+                g.addWeightedEdge(point3, point, 1);
+            }
             break;
         case 0:
-            g.addWeightedEdge(point, point2, 1);
-            g.addWeightedEdge(point2, point, 1);
+            if (!g.isWall(point2)) {
+                g.addWeightedEdge(point, point2, 1);
+                g.addWeightedEdge(point2, point, 1);
+            }
             break;
     }
 }
 
-Graph createLaberinthWithKrukal(int cols, int rows) {
-    cols = cols+2;
-    rows = rows+2;
-    Graph g(cols, rows);
-    int N = cols * rows;
-    for (int i = 0; i < cols; i++) {
-        g.addWall(i);
-        g.addWall(i + cols * (rows-1));
-    }
-    for (int i = 0; i < rows; i++) {
-        g.addWall(i * cols);
-        g.addWall(i * cols + (cols-1));
-    }
-    srand(time(nullptr));
-    g = initInnerWalls(cols, g, N);
-    return g;
-}
-
-Graph &initInnerWalls(int cols, Graph &g, int N) {
-    for (int i = 1; i < N - 1; i++) {
-        for (int j = 1; j < N-1; j++) {
-            if (isAround(i, j, cols)) {
-                int weight_edge = rand() % 5 + 2;
-                g.addWeightedEdge(i, j, weight_edge);
-            }
-        }
-    }
-
-    int lastPoint = N - 1;
-    addInitialEdges(0, cols, 1, g);
-    addInitialEdges(lastPoint, lastPoint - 1, lastPoint - cols, g);
-    return g;
-}
-
-bool isAround(int pos1, int pos2, int cols) {
+bool Graph::isAround(int pos1, int pos2) {
     bool isVerticallyAround = pos1 == (pos2 + cols) || pos1 == (pos2 - cols);
     bool isHorizontallyAround = false;
     if (pos1 / cols == pos2 / cols)
         isHorizontallyAround = pos1 == pos2 + 1 || pos1 == pos2 - 1;
     return isVerticallyAround or isHorizontallyAround;
+}
+
+bool Graph::isWall(int i) {
+    return contains(walls, i);
+}
+
+bool Graph::isPath(int i) {
+    return contains(paths, i);
+}
+
+void Graph::addPath(int i) {
+    this->paths.insert(i);
+}
+
+bool Graph::canFormASquare(pair<int, int> &pair) {
+    if (pair.first == pair.second - 1 || pair.first == pair.second + 1)
+        return canFormASquareHorizontally(pair.first, pair.second);
+    std::pair<int, int> *aCoords = toCoordinates(pair.first);
+    std::pair<int, int> *bCoords = toCoordinates(pair.second);
+    return canFormASquareVertically(aCoords, bCoords, 1) || canFormASquareVertically(aCoords, bCoords, - 1);
+}
+
+bool Graph::canFormASquareHorizontally(int first, int second) {
+    std::pair<int, int> *aCoords = toCoordinates(first);
+    std::pair<int, int> *bCoords = toCoordinates(second);
+    return canFormASquareHorizontally(aCoords, bCoords, 1) || canFormASquareHorizontally(aCoords, bCoords, -1);
+}
+
+bool Graph::canFormASquareHorizontally(const pair<int, int> *aCoords, const pair<int, int> *bCoords, int i) {
+    return isPath(toPosition(aCoords->first, aCoords->second + i)) && isPath(toPosition(bCoords->first, bCoords->second + i));
+}
+
+bool Graph::canFormASquareVertically(pair<int, int> *aCoords, pair<int, int> *bCoords, int i) {
+    return isPath(toPosition(aCoords->first + i, aCoords->second)) && isPath(toPosition(bCoords->first + i, bCoords->second));
+}
+
+Graph createLaberinthWithKruskal(int cols, int rows) {
+    cols = cols + 2;
+    rows = rows + 2;
+    Graph g(cols, rows);
+    int N = cols * rows;
+    initOuterWalls(cols, rows, g);
+    srand(time(nullptr));
+    g = initInnerWalls(cols, g, N);
+    return g;
+}
+
+void initOuterWalls(int cols, int rows, Graph &g) {
+    for (int i = 0; i < cols; i++) {
+        g.addWall(i);
+        g.addWall(i + cols * (rows - 1));
+    }
+    for (int i = 0; i < rows; i++) {
+        g.addWall(i * cols);
+        g.addWall(i * cols + (cols - 1));
+    }
+}
+
+Graph &initInnerWalls(int cols, Graph &g, int N) {
+    for (int i = cols + 1; i < N - cols - 1; i++) {
+        for (int j = cols + 1; j < N - cols - 1; j++) {
+            if (g.isAround(i, j) && !g.isWall(i) && !g.isWall(j)) {
+                int weight_edge = rand() % 5 + 2;
+                g.addWeightedEdge(i, j, weight_edge);
+            }
+        }
+    }
+    int lastPoint = N - 2 - cols;
+    addInitialEdges(cols + 1, cols * 2 + 1, cols + 2, g);
+    addInitialEdges(lastPoint, lastPoint - 1, lastPoint - cols, g);
+    g.addPath(cols+1);
+    g.addPath(lastPoint);
+    return g;
 }
 
 

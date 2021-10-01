@@ -6,9 +6,17 @@ using namespace std;
 #define ADD(x) if (x() == -1) {std::cout << "FAIL\n"; return -1;}
 #define TEST(x) int x()
 
-TEST(isAroundTest) {
-    assertEquals(true, isAround(0, 1, 4, 3));
-    assertEquals(false, isAround(0, 3, 4, 3));
+TEST(isAroundEmptyGraphTest) {
+    Graph g(4,4);
+    assertEquals(true, g.isAround(0, 1));
+    assertEquals(false, g.isAround(0, 3));
+    return 1;
+}
+
+TEST(isAroundKruskalGraphTest) {
+    Graph g = createLaberinthWithKruskal(2,2);
+    assertEquals(true, g.isAround(0, 1));
+    assertEquals(false, g.isAround(0, 3));
     return 1;
 }
 
@@ -29,8 +37,44 @@ TEST(toPositionTest) {
     return 1;
 }
 
+TEST(createWithKruskalTest) {
+    Graph g = createLaberinthWithKruskal(1,1);
+    g.printInitial();
+    g.kruskal();
+    g.printMaze();
+    return 1;
+}
+
+TEST(toCoordinatesTest) {
+    Graph g2 = createLaberinthWithKruskal(2,2);
+    pair<int, int> *x = g2.toCoordinates(5);
+    assertEquals(1,x->first);
+    assertEquals(1,x->second);
+    Graph g4 = createLaberinthWithKruskal(4,4);
+    x = g4.toCoordinates(7);
+    assertEquals(1,x->first);
+    assertEquals(1,x->second);
+    x = g4.toCoordinates(8);
+    assertEquals(2,x->first);
+    assertEquals(1,x->second);
+    return 1;
+}
+
+TEST(toPositionKruskalTest) {
+    Graph g2 = createLaberinthWithKruskal(2,2);
+    assertEquals(5, g2.toPosition(1,1));
+    assertEquals(6, g2.toPosition(2,1));
+    assertEquals(9, g2.toPosition(1,2));
+    assertEquals(10, g2.toPosition(2,2));
+    return 1;
+}
+
 int main() {
-    ADD(isAroundTest);
+    ADD(createWithKruskalTest);
+    ADD(isAroundEmptyGraphTest);
     ADD(toPositionTest);
+    ADD(isAroundKruskalGraphTest);
+    ADD(toCoordinatesTest);
+    ADD(toPositionKruskalTest);
     printf("All okey!\n");
 }
