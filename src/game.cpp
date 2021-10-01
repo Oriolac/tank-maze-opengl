@@ -2,6 +2,8 @@
 #include <cstdlib>
 #include "kruskal.cpp"
 #include "utils/dimensions.cpp"
+#include <GL/glut.h>
+
 
 int main(int argc, char **argv) {
     if (argc != 1 && argc != 3) {

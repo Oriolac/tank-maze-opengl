@@ -2,9 +2,73 @@
 #include <iostream>
 #include <vector>
 #include <set>
-#include "kruskal.h"
 
-using namespace std;
+
+class Graph {
+private:
+    std::vector<std::pair<int, std::pair<int, int>>> initial_graph;
+    std::vector<std::pair<int, std::pair<int, int>>> result_graph;  // mst
+    std::set<int> walls;
+    std::set<int> paths;
+    int cols;
+    int rows;
+    int *parent;
+    int V;  // number of vertices/nodes in graph
+public:
+    Graph(int cols, int rows);
+
+    void addWeightedEdge(int u, int v, int w);
+
+    int find_set(int i);
+
+    void union_set(int u, int v);
+
+    void kruskal();
+
+    void printResult();
+
+    bool edgeHasWalls(std::pair<int, int> edge_val);
+
+    void checkAroundNewPath(std::pair<int, int> &edgePath);
+
+    std::pair<int, int> *toCoordinates(int position) const;
+
+    int toPosition(int x, int y) const;
+
+    bool canBePath(int pos1);
+
+    void checkCanBePath(const std::pair<int, int> &edgePath, const std::pair<int, int> *coords1, int i, int j);
+
+    bool hasCornerPath(int x, int y, int i, int i1);
+
+    static bool contains(std::set<int> set1, int pos1);
+
+    void printMaze();
+
+    void addWall(int i);
+
+    void printInitial();
+
+    bool isAround(int pos1, int pos2);
+
+    bool isWall(int i);
+
+    void addPath(int i);
+
+    void checkArroundTilePath(const std::pair<int, int> &edgePath, const std::pair<int, int> *coords1);
+
+    bool canFormASquare(std::pair<int, int> &pair);
+
+    bool canFormASquareHorizontally(int first, int second);
+
+    bool isPath(int i);
+
+    bool canFormASquareHorizontally(const std::pair<int, int> *aCoords, const std::pair<int, int> *bCoords, int i);
+
+    bool canFormASquareVertically(std::pair<int, int> *pPair, std::pair<int, int> *pPair1, int i);
+};
+
+
 
 #define GO_UP (- 1)
 #define GO_DOWN (+ 1)
@@ -39,7 +103,7 @@ Graph::Graph(int cols, int rows) {
 }
 
 void Graph::addWeightedEdge(int u, int v, int w) {
-    initial_graph.emplace_back(w, edge(u, v));
+    initial_graph.emplace_back(w, std::pair<int, int>(u, v));
 }
 
 int Graph::find_set(int i) {
@@ -56,7 +120,7 @@ void Graph::union_set(int u, int v) {
     parent[u] = parent[v];
 }
 
-bool Graph::edgeHasWalls(edge current_edge) {
+bool Graph::edgeHasWalls(std::pair<int, int> current_edge) {
     return walls.find(current_edge.first) != walls.end() || walls.find(current_edge.second) != walls.end();
 }
 
@@ -64,7 +128,7 @@ void Graph::kruskal() {
     int i, uRep, vRep;
     sort(initial_graph.begin(), initial_graph.end());
     for (i = 0; i < initial_graph.size(); i++) {
-        edge &current_edge = initial_graph[i].second;
+        std::pair<int, int> &current_edge = initial_graph[i].second;
         if (edgeHasWalls(current_edge) || canFormASquare(current_edge))
             continue;
         uRep = find_set(current_edge.first);
@@ -86,33 +150,33 @@ void Graph::kruskal() {
 }
 
 void Graph::printResult() {
-    cout << "Edge :"
-         << " Weight" << endl;
+    std::cout << "Edge :"
+         << " Weight" << std::endl;
     for (auto &i: result_graph) {
-        cout << i.second.first << " - " << i.second.second << " : "
+        std::cout << i.second.first << " - " << i.second.second << " : "
              << i.first;
-        cout << endl;
+        std::cout << std::endl;
     }
 }
 
 void Graph::printInitial() {
-    cout << "Edge :"
-         << " Weight" << endl;
+    std::cout << "Edge :"
+         << " Weight" << std::endl;
     for (auto &i: initial_graph) {
-        cout << i.second.first << " - " << i.second.second << " : "
+        std::cout << i.second.first << " - " << i.second.second << " : "
              << i.first;
-        cout << endl;
+        std::cout << std::endl;
     }
 }
 
 void Graph::printMaze() {
     char map[rows][cols];
     for (int pos: paths) {
-        pair<int, int> *coord = toCoordinates(pos);
+        std::pair<int, int> *coord = toCoordinates(pos);
         map[coord->second][coord->first] = PATH_CHAR;
     }
     for (int pos: walls) {
-        pair<int, int> *coord = toCoordinates(pos);
+        std::pair<int, int> *coord = toCoordinates(pos);
         map[coord->second][coord->first] = WALL_CHAR;
     }
     for (int i = 0; i < rows; i++) {
@@ -124,8 +188,8 @@ void Graph::printMaze() {
 }
 
 
-coords *Graph::toCoordinates(int position) const {
-    return new coords(position % cols, position / cols);
+std::pair<int, int> *Graph::toCoordinates(int position) const {
+    return new std::pair<int, int>(position % cols, position / cols);
 }
 
 int Graph::toPosition(int x, int y) const {
@@ -134,14 +198,14 @@ int Graph::toPosition(int x, int y) const {
     return x + y * cols;
 }
 
-void Graph::checkAroundNewPath(edge &edgePath) {
-    pair<int, int> *coords1 = toCoordinates(edgePath.first);
-    pair<int, int> *coords2 = toCoordinates(edgePath.second);
+void Graph::checkAroundNewPath(std::pair<int, int> &edgePath) {
+    std::pair<int, int> *coords1 = toCoordinates(edgePath.first);
+    std::pair<int, int> *coords2 = toCoordinates(edgePath.second);
     checkArroundTilePath(edgePath, coords1);
     checkArroundTilePath(edgePath, coords2);
 }
 
-void Graph::checkArroundTilePath(const pair<int, int> &edgePath, const pair<int, int> *coords1) {
+void Graph::checkArroundTilePath(const std::pair<int, int> &edgePath, const std::pair<int, int> *coords1) {
     for (int i = GO_LEFT; i <= GO_RIGHT; i++) {
         for (int j = GO_UP; j <= GO_DOWN; j++) {
             checkCanBePath(edgePath, coords1, i, j);
@@ -149,7 +213,7 @@ void Graph::checkArroundTilePath(const pair<int, int> &edgePath, const pair<int,
     }
 }
 
-void Graph::checkCanBePath(const pair<int, int> &edgePath, const pair<int, int> *coords1, int i, int j) {
+void Graph::checkCanBePath(const std::pair<int, int> &edgePath, const std::pair<int, int> *coords1, int i, int j) {
     int newX = coords1->first + i;
     int newY = coords1->second + j;
     int checkPos = toPosition(newX, newY);
@@ -167,12 +231,12 @@ void Graph::checkCanBePath(const pair<int, int> &edgePath, const pair<int, int> 
 }
 
 bool Graph::canBePath(int pos1) {
-    pair<int, int> *coordsVal = toCoordinates(pos1);
+    std::pair<int, int> *coordsVal = toCoordinates(pos1);
     bool res = true;
-    vector<int> verticals = vector<int>(2);
+    std::vector<int> verticals = std::vector<int>(2);
     verticals.push_back(GO_UP);
     verticals.push_back(GO_DOWN);
-    vector<int> horizontals = vector<int>(2);
+    std::vector<int> horizontals = std::vector<int>(2);
     verticals.push_back(GO_LEFT);
     verticals.push_back(GO_RIGHT);
     for (int i = -1; i < 2; i++) {
@@ -196,7 +260,7 @@ bool Graph::hasCornerPath(int x, int y, int vert, int horiz) {
     return contains(paths, pos1) && contains(paths, pos2) && contains(paths, pos3);
 }
 
-bool Graph::contains(set<int> set1, int el) {
+bool Graph::contains(std::set<int> set1, int el) {
     return set1.find(el) != set1.end();
 }
 
@@ -242,7 +306,7 @@ void Graph::addPath(int i) {
     this->paths.insert(i);
 }
 
-bool Graph::canFormASquare(pair<int, int> &pair) {
+bool Graph::canFormASquare(std::pair<int, int> &pair) {
     if (pair.first == pair.second - 1 || pair.first == pair.second + 1)
         return canFormASquareHorizontally(pair.first, pair.second);
     std::pair<int, int> *aCoords = toCoordinates(pair.first);
@@ -256,11 +320,11 @@ bool Graph::canFormASquareHorizontally(int first, int second) {
     return canFormASquareHorizontally(aCoords, bCoords, 1) || canFormASquareHorizontally(aCoords, bCoords, -1);
 }
 
-bool Graph::canFormASquareHorizontally(const pair<int, int> *aCoords, const pair<int, int> *bCoords, int i) {
+bool Graph::canFormASquareHorizontally(const std::pair<int, int> *aCoords, const std::pair<int, int> *bCoords, int i) {
     return isPath(toPosition(aCoords->first, aCoords->second + i)) && isPath(toPosition(bCoords->first, bCoords->second + i));
 }
 
-bool Graph::canFormASquareVertically(pair<int, int> *aCoords, pair<int, int> *bCoords, int i) {
+bool Graph::canFormASquareVertically(std::pair<int, int> *aCoords, std::pair<int, int> *bCoords, int i) {
     return isPath(toPosition(aCoords->first + i, aCoords->second)) && isPath(toPosition(bCoords->first + i, bCoords->second));
 }
 
