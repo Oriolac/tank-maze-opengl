@@ -66,6 +66,12 @@ public:
     bool canFormASquareHorizontally(const std::pair<int, int> *aCoords, const std::pair<int, int> *bCoords, int i);
 
     bool canFormASquareVertically(std::pair<int, int> *pPair, std::pair<int, int> *pPair1, int i);
+
+    int getCols();
+
+    int getRows();
+
+    int getNumTiles();
 };
 
 
@@ -326,6 +332,19 @@ bool Graph::canFormASquareHorizontally(const std::pair<int, int> *aCoords, const
 
 bool Graph::canFormASquareVertically(std::pair<int, int> *aCoords, std::pair<int, int> *bCoords, int i) {
     return isPath(toPosition(aCoords->first + i, aCoords->second)) && isPath(toPosition(bCoords->first + i, bCoords->second));
+}
+
+int Graph::getCols() {
+    return this->cols;
+}
+
+
+int Graph::getRows() {
+    return this->rows;
+}
+
+int Graph::getNumTiles() {
+    return this->V;
 }
 
 Graph createLaberinthWithKruskal(int cols, int rows) {
