@@ -5,13 +5,16 @@
 #include <GL/glut.h>
 
 
-#define WIDTH 500
-#define HEIGHT 500
+#define MAX_WIDTH 900
+#define MAX_HEIGHT 900
+#define SIDE_LENGTH 30
 
 
 Graph graph = Graph(0, 0);
 int COLUMNS;
 int ROWS;
+int WIDTH;
+int HEIGHT;
 
 void display();
 
@@ -29,9 +32,11 @@ int main(int argc, char **argv) {
 
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB);
+    WIDTH = SIDE_LENGTH * graph.getCols();
+    HEIGHT = SIDE_LENGTH * graph.getRows();
     glutInitWindowPosition(50, 50);
     glutInitWindowSize(WIDTH, HEIGHT);
-    glutCreateWindow("Chess board");
+    glutCreateWindow("Maze");
 
     glutDisplayFunc(display);
 
