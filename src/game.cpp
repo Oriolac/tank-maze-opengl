@@ -8,7 +8,6 @@
 #define WIDTH 500
 #define HEIGHT 500
 
-int keyflag = 0;
 
 Graph graph = Graph(0, 0);
 int COLUMNS;
@@ -49,20 +48,21 @@ void display() {
 
     glClearColor(0.0, 0.0, 0.0, 0.0);
     glClear(GL_COLOR_BUFFER_BIT);
-    for (i = 0; i < WIDTH; i++)
-        for (j = 0; j < HEIGHT; j++)
-            if ((keyflag == 0 && (i + j) % 2 == 0) || (keyflag == 1 && (i + j) % 2 == 1)) {
-                glColor3f(0.6, 0.6, 0.6);
-                glBegin(GL_QUADS);
-
-                glVertex2i(i * WIDTH / COLUMNS , j * HEIGHT / ROWS);
-                glVertex2i((i + 1) * WIDTH / COLUMNS, j * HEIGHT / ROWS);
-                glVertex2i((i + 1) * WIDTH / COLUMNS, (j + 1) * HEIGHT / ROWS);
-                glVertex2i(i * WIDTH / COLUMNS, (j + 1) * HEIGHT / ROWS);
-
-                glEnd();
-            }
-
+    int tile_count = 0;
+    for (int tile_count = 0; tile_count < graph.getNumTiles(); tile_count++) {
+        if (graph.isWall(tile_count)) {
+            std::pair<int, int> *coords = graph.toCoordinates(tile_count);
+            glColor3f(0.6, 0.6, 0.6);
+            glBegin(GL_QUADS);
+            i = coords->first;
+            j = coords->second;
+            glVertex2i(i * WIDTH / COLUMNS, j * HEIGHT / ROWS);
+            glVertex2i((i + 1) * WIDTH / COLUMNS, j * HEIGHT / ROWS);
+            glVertex2i((i + 1) * WIDTH / COLUMNS, (j + 1) * HEIGHT / ROWS);
+            glVertex2i(i * WIDTH / COLUMNS, (j + 1) * HEIGHT / ROWS);
+            glEnd();
+        }
+    }
     glutSwapBuffers();
 
 }

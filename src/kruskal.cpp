@@ -70,6 +70,8 @@ public:
     int getCols();
 
     int getRows();
+
+    int getNumTiles();
 };
 
 
@@ -339,6 +341,10 @@ int Graph::getCols() {
 
 int Graph::getRows() {
     return this->rows;
+}
+
+int Graph::getNumTiles() {
+    return this->V;
 }
 
 Graph createLaberinthWithKruskal(int cols, int rows) {
