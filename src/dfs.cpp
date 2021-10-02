@@ -1,5 +1,6 @@
 #include <iostream>
 #include <set>
+#include <valarray>
 
 
 using namespace std;
@@ -42,6 +43,12 @@ public:
     int getCols();
 
     int getRows();
+
+    void addWalls();
+
+    bool checkCanBePath(int tile);
+
+    int is_in_bounds(int pos);
 };
 
 GraphDFS::GraphDFS(int cols, int rows) {
@@ -68,14 +75,16 @@ int GraphDFS::is_in_bounds(int x, int y) {
     return true;
 }
 
+int GraphDFS::is_in_bounds(int pos) {
+    // Returns "true" if x and y are both in-bounds.
+    pair<int, int> *coords = toCoordinates(pos);
+    return is_in_bounds(coords->first, coords->second);
+}
+
 void GraphDFS::visit(int x, int y) {
-    // Starting at the given index, recursively visits every direction in a
-    // randomized order.
-    // Set my current location to be an empty passage.
     grid[to_pos(x, y)] = ' ';
     paths.insert(to_pos(x, y));
 
-    // Create an local array containing the 4 directions and shuffle their order.
     int dirs[4] = {NORTH, EAST, SOUTH, WEST};
     for (int &dir: dirs) {
         int r = rand() & 3;
@@ -83,10 +92,7 @@ void GraphDFS::visit(int x, int y) {
         dirs[r] = dir;
         dir = temp;
     }
-    // Loop through every direction and attempt to visit that direction.
     for (int dir: dirs) {
-        // dx,dy are offsets from current location. Set them based
-        // on the next direction I wish to try.
         int dx = 0, dy = 0;
         switch (dir) {
             case NORTH:
@@ -116,7 +122,6 @@ void GraphDFS::visit(int x, int y) {
 }
 
 void GraphDFS::print() {
-    // Displays the finished maze to the screen.
     for (int y = 0; y < GRID_HEIGHT; ++y) {
         for (int x = 0; x < GRID_WIDTH; ++x) {
             cout << grid[to_pos(x, y)];
@@ -126,9 +131,10 @@ void GraphDFS::print() {
 }
 
 void GraphDFS::start() {
-    srand(time(0)); // seed random number generator.
+    srand(time(nullptr));
     reset_grid();
     this->visit(1, 1);
+    this->addWalls();
 }
 
 int GraphDFS::getNumTiles() {
@@ -153,5 +159,33 @@ int GraphDFS::getCols() {
 
 int GraphDFS::getRows() {
     return GRID_HEIGHT;
+}
+
+void GraphDFS::addWalls() {
+    for (int i = 0; i < (int) sqrt(getNumTiles())/3; i++) {
+        int random_tile = rand() % getNumTiles();
+        while (contains(paths, random_tile) || !checkCanBePath(random_tile)) {
+            random_tile = rand() % getNumTiles();
+        }
+        paths.insert(random_tile);
+        printf("%i\n", random_tile);
+    }
+}
+
+bool GraphDFS::checkCanBePath(int tile) {
+    pair<int, int> *coords = toCoordinates(tile);
+    if (coords->first == 0 || coords->first == this->GRID_WIDTH-1)
+        return false;
+    if (coords->second == 0 || coords->second == this->GRID_HEIGHT-1)
+        return false;
+    int right = to_pos(coords->first + 1, coords->second);
+    int left = to_pos(coords->first - 1, coords->second);
+    int down = to_pos(coords->first, coords->second + 1);
+    int up = to_pos(coords->first, coords->second - 1);
+    if (!(is_in_bounds(right) && is_in_bounds(left) && is_in_bounds(down) && is_in_bounds(up)))
+        return false;
+    bool result = contains(paths, right) && contains(paths, left) && !contains(paths, up) && !contains(paths, down);
+    result = result || !contains(paths, right) && !contains(paths, left) && contains(paths, up) && contains(paths, down);
+    return result;
 }
 
