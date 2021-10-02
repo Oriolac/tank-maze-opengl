@@ -1,8 +1,9 @@
 #include <cstdio>
 #include <cstdlib>
-#include "kruskal.cpp"
+#include "dfs.cpp"
 #include "utils/dimensions.cpp"
 #include <GL/glut.h>
+
 
 
 #define MAX_WIDTH 900
@@ -10,7 +11,7 @@
 #define SIDE_LENGTH 30
 
 
-Graph graph = Graph(0, 0);
+GraphDFS graph = GraphDFS(0, 0);
 int COLUMNS;
 int ROWS;
 int WIDTH;
@@ -24,9 +25,9 @@ int main(int argc, char **argv) {
         return 0;
     }
     Dimensions dimensions = getDimensions(argc, argv);
-    graph = createLaberinthWithKruskal(dimensions.cols, dimensions.rows);
-    graph.kruskal();
-    graph.printMaze();
+    graph = GraphDFS(dimensions.cols, dimensions.rows);
+    graph.start();
+    graph.print();
     COLUMNS = graph.getCols();
     ROWS = graph.getRows();
 
@@ -47,13 +48,11 @@ int main(int argc, char **argv) {
 
 }
 
-
 void display() {
     int i, j;
 
     glClearColor(0.0, 0.0, 0.0, 0.0);
     glClear(GL_COLOR_BUFFER_BIT);
-    int tile_count = 0;
     for (int tile_count = 0; tile_count < graph.getNumTiles(); tile_count++) {
         if (graph.isWall(tile_count)) {
             std::pair<int, int> *coords = graph.toCoordinates(tile_count);
