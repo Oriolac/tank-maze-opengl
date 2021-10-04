@@ -1,7 +1,7 @@
 #include <iostream>
 #include <set>
 #include <valarray>
-#include "utils/GraphAdapter.h"
+#include "utils/GraphInterface.h"
 
 
 using namespace std;
@@ -12,12 +12,12 @@ using namespace std;
 #define WEST 3
 
 
-class GraphDFS {
+class GraphDFS : public GraphInterface {
 private:
     char grid[MAX_GRID_LENGTH]{};
     std::set<int> paths;
 public:
-    GraphDFS(int cols, int rows) {
+    GraphDFS(int cols, int rows) : GraphInterface(cols, rows) {
         this->cols = cols % 2 == 1 ? cols : cols + 1;
         this->rows = rows % 2 == 1 ? rows : rows + 1;
     }
@@ -30,21 +30,36 @@ public:
 
     void visit(int x, int y);
 
-    void print();
+    void print() override;
 
-    void start();
+    void start() override {
+        srand(time(nullptr));
+        reset_grid();
+        this->visit(1, 1);
+        this->addWalls();
+    }
 
-    int getNumTiles();
+    int getNumTiles() override {
+        return this->getCols() * this->getRows();
+    }
 
-    bool isWall(int i);
+    bool isWall(int i) override {
+        return !contains(paths, i);
+    }
 
     bool contains(set<int> set1, int el);
 
-    pair<int, int> *toCoordinates(int i);
+    pair<int, int> *toCoordinates(int i) override {
+        return new std::pair<int, int>(i % this->getCols(), i / this->getCols());
+    }
 
-    int getCols();
+    int getCols() override {
+        return cols;
+    }
 
-    int getRows();
+    int getRows() override {
+        return rows;
+    }
 
     void addWalls();
 
@@ -130,36 +145,11 @@ void GraphDFS::print() {
     }
 }
 
-void GraphDFS::start() {
-    srand(time(nullptr));
-    reset_grid();
-    this->visit(1, 1);
-    this->addWalls();
-}
-
-int GraphDFS::getNumTiles() {
-    return this->getCols() * this->getRows();
-}
-
-bool GraphDFS::isWall(int i) {
-    return !contains(paths, i);
-}
 
 bool GraphDFS::contains(std::set<int> set1, int el) {
     return set1.find(el) != set1.end();
 }
 
-pair<int, int> *GraphDFS::toCoordinates(int i) {
-    return new std::pair<int, int>(i % this->getCols(), i / this->getCols());
-}
-
-int GraphDFS::getCols() {
-    return cols;
-}
-
-int GraphDFS::getRows() {
-    return rows;
-}
 
 void GraphDFS::addWalls() {
     int sqrt_tiles = (int) sqrt(getNumTiles());

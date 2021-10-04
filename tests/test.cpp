@@ -7,21 +7,21 @@ using namespace std;
 #define TEST(x) int x()
 
 TEST(isAroundEmptyGraphTest) {
-    Graph g(4,4);
+    GraphKruskal g(4, 4);
     assertEquals(true, g.isAround(0, 1));
     assertEquals(false, g.isAround(0, 3));
     return 1;
 }
 
 TEST(isAroundKruskalGraphTest) {
-    Graph g = createLaberinthWithKruskal(2,2);
+    GraphKruskal g = createLaberinthWithKruskal(2, 2);
     assertEquals(true, g.isAround(0, 1));
     assertEquals(false, g.isAround(0, 3));
     return 1;
 }
 
 TEST(toPositionTest) {
-    Graph g(4, 3);
+    GraphKruskal g(4, 3);
     assertEquals(0, g.toPosition(0,0));
     assertEquals(1, g.toPosition(1,0));
     assertEquals(2, g.toPosition(2,0));
@@ -38,19 +38,19 @@ TEST(toPositionTest) {
 }
 
 TEST(createWithKruskalTest) {
-    Graph g = createLaberinthWithKruskal(1,1);
+    GraphKruskal g = createLaberinthWithKruskal(1, 1);
     g.printInitial();
-    g.kruskal();
+    g.start();
     g.printMaze();
     return 1;
 }
 
 TEST(toCoordinatesTest) {
-    Graph g2 = createLaberinthWithKruskal(2,2);
+    GraphKruskal g2 = createLaberinthWithKruskal(2, 2);
     pair<int, int> *x = g2.toCoordinates(5);
     assertEquals(1,x->first);
     assertEquals(1,x->second);
-    Graph g4 = createLaberinthWithKruskal(4,4);
+    GraphKruskal g4 = createLaberinthWithKruskal(4, 4);
     x = g4.toCoordinates(7);
     assertEquals(1,x->first);
     assertEquals(1,x->second);
@@ -61,7 +61,7 @@ TEST(toCoordinatesTest) {
 }
 
 TEST(toPositionKruskalTest) {
-    Graph g2 = createLaberinthWithKruskal(2,2);
+    GraphKruskal g2 = createLaberinthWithKruskal(2, 2);
     assertEquals(5, g2.toPosition(1,1));
     assertEquals(6, g2.toPosition(2,1));
     assertEquals(9, g2.toPosition(1,2));
