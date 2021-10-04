@@ -1,6 +1,6 @@
 
 all: compile
-	./comp/game 20 20
+	./comp/game 10 10
 
 compile: src/game.cpp
 	gcc ./src/game.cpp -o ./comp/game -lglut -lGLU -lGL -lm -lstdc++

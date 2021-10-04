@@ -2,12 +2,11 @@
 #include <cstdlib>
 #include "dfs.cpp"
 #include "utils/dimensions.cpp"
+#include "utils/GraphAdapter.h"
 #include <GL/glut.h>
 
 
 
-#define MAX_WIDTH 900
-#define MAX_HEIGHT 900
 #define SIDE_LENGTH 30
 
 
@@ -27,7 +26,6 @@ int main(int argc, char **argv) {
     Dimensions dimensions = getDimensions(argc, argv);
     graph = GraphDFS(dimensions.cols, dimensions.rows);
     graph.start();
-    graph.print();
     COLUMNS = graph.getCols();
     ROWS = graph.getRows();
 

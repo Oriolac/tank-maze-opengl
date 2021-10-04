@@ -4,7 +4,7 @@
 #include <set>
 
 
-class Graph {
+class Graph : public GraphAdapter {
 private:
     std::vector<std::pair<int, std::pair<int, int>>> initial_graph;
     std::vector<std::pair<int, std::pair<int, int>>> result_graph;  // mst
