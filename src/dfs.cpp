@@ -40,7 +40,9 @@ public:
     }
 
     int getNumTiles() override {
-        return this->getCols() * this->getRows();
+        int cols = getCols();
+        int rows = getRows();
+        return cols * rows;
     }
 
     bool isWall(int i) override {
@@ -137,7 +139,7 @@ void GraphDFS::visit(int x, int y) {
 }
 
 void GraphDFS::print() {
-    for (int y = 0; y < getRows(); ++y) {
+    for (int y = getRows() - 1; y >= 0 ; y--) {
         for (int x = 0; x < getCols(); ++x) {
             cout << grid[to_pos(x, y)];
         }
@@ -167,6 +169,7 @@ void GraphDFS::addWalls() {
         while (contains(paths, random_tile) || !checkCanBePath(random_tile)) {
             random_tile = rand() % getNumTiles();
         }
+        grid[random_tile] = ' ';
         paths.insert(random_tile);
     }
 }
