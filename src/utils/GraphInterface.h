@@ -14,10 +14,10 @@ public:
         this->rows = rows % 2 == 1 ? rows : rows + 1;
     }
 
-    [[nodiscard]] std::pair<int, int> get_initial_pos() const {
+    [[nodiscard]] std::pair<int, int> get_main_coords() const {
         return {1, rows-2};
     }
-    [[nodiscard]] std::pair<int, int> get_last_pos() const {
+    [[nodiscard]] std::pair<int, int> get_enemy_coords() const {
         return {cols-2, 1};
     }
 

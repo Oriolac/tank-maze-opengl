@@ -1,6 +1,6 @@
 
 all: compile
-	./comp/game 10 17 --print
+	./comp/game 10 17
 
 compile: src/game.cpp
 	gcc ./src/game.cpp -o ./comp/game -lglut -lGLU -lGL -lm -lstdc++

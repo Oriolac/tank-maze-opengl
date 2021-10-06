@@ -9,15 +9,14 @@
 #define SIDE_LENGTH 30
 
 #define COLOR_WALL Color(0.6, 0.6, 0.7)
-#define INITIAL_PATH_COLOR Color(0.2, 0.8, 0.2)
-#define LAST_PATH_COLOR Color(0.8, 0.2, 0.2)
+#define MAIN_CHARACTER_INITIAL_POS Color(0.2, 0.8, 0.2)
+#define ENEMY_CHARACTER_LAST_POS Color(0.8, 0.2, 0.2)
 
 GraphInterface *graph;
 int COLUMNS;
 int ROWS;
 int WIDTH;
 int HEIGHT;
-
 
 
 void display();
@@ -96,10 +95,10 @@ void display() {
             addSquare(i, j, COLOR_WALL);
         }
     }
-    pair<int, int> initial_pos = graph->get_initial_pos();
-    addSquare(initial_pos.first, initial_pos.second, INITIAL_PATH_COLOR);
-    pair<int, int> last_pos = graph->get_last_pos();
-    addSquare(last_pos.first, last_pos.second, LAST_PATH_COLOR);
+    pair<int, int> initial_pos = graph->get_main_coords();
+    addSquare(initial_pos.first, initial_pos.second, MAIN_CHARACTER_INITIAL_POS);
+    pair<int, int> last_pos = graph->get_enemy_coords();
+    addSquare(last_pos.first, last_pos.second, ENEMY_CHARACTER_LAST_POS);
     glutSwapBuffers();
 
 }
