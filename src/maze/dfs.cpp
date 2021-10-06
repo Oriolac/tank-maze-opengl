@@ -1,7 +1,7 @@
 #include <iostream>
 #include <set>
 #include <valarray>
-#include "utils/GraphInterface.h"
+#include "GraphInterface.h"
 
 
 using namespace std;
@@ -43,7 +43,7 @@ public:
         return getCols() * getRows();
     }
 
-    bool isWall(int i) override {
+    bool is_wall(int i) override {
         return !contains(paths, i);
     }
 

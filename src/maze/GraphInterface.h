@@ -29,7 +29,7 @@ public:
 
     virtual int getNumTiles() = 0;
 
-    virtual bool isWall(int i) = 0;
+    virtual bool is_wall(int i) = 0;
 
     virtual std::pair<int, int> *toCoordinates(int i) = 0;
 

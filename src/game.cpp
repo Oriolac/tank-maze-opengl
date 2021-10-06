@@ -1,16 +1,14 @@
 #include <cstdio>
 #include <cstdlib>
-#include "dfs.cpp"
+#include "maze/dfs.cpp"
 #include "utils/dimensions.cpp"
-#include "utils/GraphInterface.h"
+#include "maze/GraphInterface.h"
 #include <GL/glut.h>
 #include "utils/graphics.h"
+#include "Character.cpp"
 
 #define SIDE_LENGTH 30
 
-#define COLOR_WALL Color(0.55, 0.55, 0.7)
-#define MAIN_CHARACTER_INITIAL_POS Color(0.2, 0.8, 0.2)
-#define ENEMY_CHARACTER_LAST_POS Color(0.8, 0.2, 0.2)
 #define BACKGROUND_COLOR 0.75, 0.75, 0.9, 0.0
 
 GraphInterface *graph;
@@ -18,7 +16,6 @@ int COLUMNS;
 int ROWS;
 int WIDTH;
 int HEIGHT;
-
 
 void display();
 
@@ -41,7 +38,7 @@ int main(int argc, char **argv) {
     graph = static_cast<GraphInterface *>(malloc(sizeof(GraphDFS)));
     if (!graph) {
         printf("malloc failed\n");
-        return -1;
+        exit(-1);
     }
     graph = &graphDfs;
     for (int i = 3; i < argc; i++) {
@@ -52,7 +49,7 @@ int main(int argc, char **argv) {
         if (std::equal(tok.begin(), tok.end(), std::string("--func").begin())) {
             s.erase(0, pos + delimiter.length());
             tok = s.substr(0, pos + 1);
-            GraphDFS graphDfs = GraphDFS(dimensions.cols, dimensions.rows);
+            graphDfs = GraphDFS(dimensions.cols, dimensions.rows);
             graph = &graphDfs;
         } else if (std::equal(tok.begin(), tok.end(), std::string("--print").begin())) {
             mustPrint = true;
@@ -89,7 +86,14 @@ void config_opengl(int &argc, char **argv) {
 
 void display() {
     maze_display();
+    characters_display();
     glutSwapBuffers();
+}
+
+void characters_display() {
+    MainCharacter main_character = MainCharacter(graph->get_main_coords(), SIDE_LENGTH);
+    EnemyCharacter enemy_character = EnemyCharacter(graph->get_enemy_coords(), SIDE_LENGTH);
+
 }
 
 
@@ -98,7 +102,7 @@ void maze_display() {
     glClearColor(BACKGROUND_COLOR);
     glClear(GL_COLOR_BUFFER_BIT);
     for (int tile_count = 0; tile_count < COLUMNS * ROWS; tile_count++) {
-        if (graph->isWall(tile_count)) {
+        if (graph->is_wall(tile_count)) {
             pair<int, int> *coords = graph->toCoordinates(tile_count);
             i = coords->first;
             j = coords->second;
@@ -106,9 +110,9 @@ void maze_display() {
         }
     }
     pair<int, int> initial_pos = graph->get_main_coords();
-    addSquare(initial_pos.first, initial_pos.second, MAIN_CHARACTER_INITIAL_POS);
+    addSquare(initial_pos.first, initial_pos.second, COLOR_MAIN_CHARACTER_INITIAL_POS);
     pair<int, int> last_pos = graph->get_enemy_coords();
-    addSquare(last_pos.first, last_pos.second, ENEMY_CHARACTER_LAST_POS);
+    addSquare(last_pos.first, last_pos.second, COLOR_ENEMY_CHARACTER_LAST_POS);
 }
 
 void addSquare(int i, int j, struct Color color) {
