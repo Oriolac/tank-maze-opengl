@@ -27,6 +27,10 @@ void maze_display();
 
 void characters_display();
 
+void keyboard(unsigned char c, int x, int y);
+
+void idle();
+
 int main(int argc, char **argv) {
     if (argc < 1 || argc > 4) {
         printf("Usage:\n\t./maze [<rows>=20 <cols>=20 [--func={start, dfsbrave, dfsheur}]]\n");
@@ -76,6 +80,8 @@ void config_opengl(int &argc, char **argv) {
     glutInitWindowSize(WIDTH, HEIGHT);
     glutCreateWindow("Maze");
     glutDisplayFunc(display);
+    glutKeyboardFunc(keyboard);
+    glutIdleFunc(idle);
 
     glMatrixMode(GL_PROJECTION);
     gluOrtho2D(0, WIDTH - 1, 0, HEIGHT - 1);
@@ -93,7 +99,6 @@ void display() {
 void characters_display() {
     MainCharacter main_character = MainCharacter(graph->get_main_coords(), SIDE_LENGTH);
     EnemyCharacter enemy_character = EnemyCharacter(graph->get_enemy_coords(), SIDE_LENGTH);
-
 }
 
 
@@ -113,6 +118,31 @@ void maze_display() {
     addSquare(initial_pos.first, initial_pos.second, COLOR_MAIN_CHARACTER_INITIAL_POS);
     pair<int, int> last_pos = graph->get_enemy_coords();
     addSquare(last_pos.first, last_pos.second, COLOR_ENEMY_CHARACTER_LAST_POS);
+}
+
+void keyboard(unsigned char c, int x, int y) {
+    switch (c) {
+        case 'a':case 'A':
+            printf("LEFT\n");
+            break;
+        case 'd':case 'D':
+            printf("RIGHT\n");
+            break;
+        case 'w':case 'W':
+            printf("UP\n");
+            break;
+        case 's':case 'S':
+            printf("DOWN\n");
+            break;
+        default:
+            break;
+    }
+    glutPostRedisplay();
+};
+
+void idle() {
+    t=glutGet(GLUT_ELAPSED_TIME);
+
 }
 
 void addSquare(int i, int j, struct Color color) {

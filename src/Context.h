@@ -7,7 +7,9 @@
 
 
 class Context {
-
+    GraphInterface graph;
+    MainCharacter main_character;
+    EnemyCharacter enemy_character;
 };
 
 
