@@ -14,6 +14,13 @@ public:
         this->rows = rows % 2 == 1 ? rows : rows + 1;
     }
 
+    [[nodiscard]] std::pair<int, int> get_initial_pos() const {
+        return {1, rows-2};
+    }
+    [[nodiscard]] std::pair<int, int> get_last_pos() const {
+        return {cols-2, 1};
+    }
+
     virtual void start() = 0;
 
     virtual int getCols() = 0;
