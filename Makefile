@@ -1,9 +1,10 @@
 
 all: compile
-	./comp/game 30 30
+	./comp/game 10 17
 
 compile: src/game.cpp
 	gcc ./src/game.cpp -o ./comp/game -lglut -lGLU -lGL -lm -lstdc++
+
 
 clean:
 	rm ./src/maze
