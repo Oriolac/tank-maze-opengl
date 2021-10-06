@@ -28,21 +28,19 @@ public:
 
     int is_in_bounds(int x, int y);
 
-    void visit(int x, int y);
+    void dfs(int x, int y);
 
     void print() override;
 
     void start() override {
         srand(time(nullptr));
         reset_grid();
-        this->visit(1, 1);
-        this->addWalls();
+        this->dfs(1, 1);
+        this->add_extra_paths();
     }
 
     int getNumTiles() override {
-        int cols = getCols();
-        int rows = getRows();
-        return cols * rows;
+        return getCols() * getRows();
     }
 
     bool isWall(int i) override {
@@ -63,9 +61,9 @@ public:
         return rows;
     }
 
-    void addWalls();
+    void add_extra_paths();
 
-    bool checkCanBePath(int tile);
+    bool check_can_be_path(int tile);
 
     int is_in_bounds(int pos);
 
@@ -98,7 +96,7 @@ int GraphDFS::is_in_bounds(int pos) {
     return is_in_bounds(coords->first, coords->second);
 }
 
-void GraphDFS::visit(int x, int y) {
+void GraphDFS::dfs(int x, int y) {
     grid[to_pos(x, y)] = ' ';
     paths.insert(to_pos(x, y));
 
@@ -132,7 +130,7 @@ void GraphDFS::visit(int x, int y) {
                 int pos = to_pos(x2 - dx, y2 - dy);
                 grid[pos] = ' ';
                 paths.insert(pos);
-                visit(x2, y2);
+                dfs(x2, y2);
             }
         }
     }
@@ -153,7 +151,7 @@ bool GraphDFS::contains(std::set<int> set1, int el) {
 }
 
 
-void GraphDFS::addWalls() {
+void GraphDFS::add_extra_paths() {
     int sqrt_tiles = (int) sqrt(getNumTiles());
     int limit = 0;
     switch (sqrt_tiles) {
@@ -166,7 +164,7 @@ void GraphDFS::addWalls() {
     }
     for (int i = 0; i < limit; i++) {
         int random_tile = rand() % getNumTiles();
-        while (contains(paths, random_tile) || !checkCanBePath(random_tile)) {
+        while (contains(paths, random_tile) || !check_can_be_path(random_tile)) {
             random_tile = rand() % getNumTiles();
         }
         grid[random_tile] = ' ';
@@ -174,7 +172,7 @@ void GraphDFS::addWalls() {
     }
 }
 
-bool GraphDFS::checkCanBePath(int tile) {
+bool GraphDFS::check_can_be_path(int tile) {
     pair<int, int> *coords = toCoordinates(tile);
     if (coords->first == 0 || coords->first == this->getCols() - 1)
         return false;

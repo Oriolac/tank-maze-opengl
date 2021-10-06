@@ -8,9 +8,10 @@
 
 #define SIDE_LENGTH 30
 
-#define COLOR_WALL Color(0.6, 0.6, 0.7)
+#define COLOR_WALL Color(0.55, 0.55, 0.7)
 #define MAIN_CHARACTER_INITIAL_POS Color(0.2, 0.8, 0.2)
 #define ENEMY_CHARACTER_LAST_POS Color(0.8, 0.2, 0.2)
+#define BACKGROUND_COLOR 0.75, 0.75, 0.9, 0.0
 
 GraphInterface *graph;
 int COLUMNS;
@@ -24,6 +25,10 @@ void display();
 void config_opengl(int &argc, char **argv);
 
 void addSquare(int i, int j, struct Color color);
+
+void maze_display();
+
+void characters_display();
 
 int main(int argc, char **argv) {
     if (argc < 1 || argc > 4) {
@@ -83,13 +88,18 @@ void config_opengl(int &argc, char **argv) {
 
 
 void display() {
-    int i, j;
-    glClearColor(0.1, 0.1, 0.1, 0.0);
+    maze_display();
+    glutSwapBuffers();
+}
 
+
+void maze_display() {
+    int i, j;
+    glClearColor(BACKGROUND_COLOR);
     glClear(GL_COLOR_BUFFER_BIT);
     for (int tile_count = 0; tile_count < COLUMNS * ROWS; tile_count++) {
         if (graph->isWall(tile_count)) {
-            std::pair<int, int> *coords = graph->toCoordinates(tile_count);
+            pair<int, int> *coords = graph->toCoordinates(tile_count);
             i = coords->first;
             j = coords->second;
             addSquare(i, j, COLOR_WALL);
@@ -99,8 +109,6 @@ void display() {
     addSquare(initial_pos.first, initial_pos.second, MAIN_CHARACTER_INITIAL_POS);
     pair<int, int> last_pos = graph->get_enemy_coords();
     addSquare(last_pos.first, last_pos.second, ENEMY_CHARACTER_LAST_POS);
-    glutSwapBuffers();
-
 }
 
 void addSquare(int i, int j, struct Color color) {
