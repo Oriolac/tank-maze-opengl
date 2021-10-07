@@ -20,6 +20,8 @@ int ROWS;
 int WIDTH;
 int HEIGHT;
 
+int last_t = 0;
+
 void display();
 
 void config_opengl(int &argc, char **argv);
@@ -73,8 +75,11 @@ int main(int argc, char **argv) {
     graph->start();
     if (mustPrint)
         graph->print();
+    MainCharacter main_character = MainCharacter(graph->get_main_coords(), SIDE_LENGTH);
+    EnemyCharacter enemy_character = EnemyCharacter(graph->get_enemy_coords(), SIDE_LENGTH);
+    Context new_cont = Context(graph, &main_character, &enemy_character);
+    context = &new_cont;
     config_opengl(argc, argv);
-
 }
 
 void config_opengl(int &argc, char **argv) {
@@ -94,10 +99,7 @@ void config_opengl(int &argc, char **argv) {
     glMatrixMode(GL_PROJECTION);
     gluOrtho2D(0, WIDTH - 1, 0, HEIGHT - 1);
 
-    MainCharacter main_character = MainCharacter(graph->get_main_coords(), SIDE_LENGTH);
-    EnemyCharacter enemy_character = EnemyCharacter(graph->get_enemy_coords(), SIDE_LENGTH);
-    Context new_cont = Context(graph, &main_character, &enemy_character);
-    context = &new_cont;
+
     glutMainLoop();
 }
 
@@ -134,18 +136,25 @@ void maze_display() {
 
 void keyboard(unsigned char c, int x, int y) {
     switch (c) {
-        case 'a':case 'A':
+        case 'a':
+        case 'A':
+            context->move(Direction::LEFT);
             printf("LEFT\n");
-
             break;
-        case 'd':case 'D':
+        case 'd':
+        case 'D':
             printf("RIGHT\n");
+            context->move(Direction::RIGHT);
             break;
-        case 'w':case 'W':
+        case 'w':
+        case 'W':
             printf("UP\n");
+            context->move(Direction::UP);
             break;
-        case 's':case 'S':
+        case 's':
+        case 'S':
             printf("DOWN\n");
+            context->move(Direction::DOWN);
             break;
         default:
             break;
@@ -154,8 +163,14 @@ void keyboard(unsigned char c, int x, int y) {
 };
 
 void idle() {
-    int t=glutGet(GLUT_ELAPSED_TIME);
-
+    int t = glutGet(GLUT_ELAPSED_TIME);
+    if (last_t == 0)
+        last_t = t;
+    else {
+        context->getMainCharacter()->integrate(t -  last_t);
+        last_t = t;
+    }
+    glutPostRedisplay();
 }
 
 void addSquare(int i, int j, struct Color color) {

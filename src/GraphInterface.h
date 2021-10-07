@@ -20,10 +20,11 @@ public:
 
 
     std::pair<int, int> get_main_coords() {
-        return {1, getRows()-2};
+        return {1, getRows() - 2};
     }
+
     [[nodiscard]] std::pair<int, int> get_enemy_coords() {
-        return {getCols()-2, 1};
+        return {getCols() - 2, 1};
     }
 
     virtual int getRows() = 0;
@@ -34,6 +35,10 @@ public:
 
     std::pair<int, int> *toCoordinates(int i) {
         return new std::pair<int, int>(i % this->getCols(), i / this->getCols());
+    }
+
+    bool is_wall(int x, int y) {
+        return is_wall(y * getCols() + x);
     }
 
     virtual void print() = 0;

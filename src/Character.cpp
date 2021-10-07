@@ -5,11 +5,17 @@
 #include "Character.h"
 #include "utils/graphics.h"
 
+
+std::pair<int, int> Character:: getCoords() {
+    return {this->xTile, this->yTile};
+}
+
 MainCharacter::MainCharacter(std::pair<int, int> coords, int tile_side_length) : Character(coords, tile_side_length) {
     draw();
 }
 
 void MainCharacter::draw() {
+    update_state();
     glBegin(GL_TRIANGLES);
     glColor3f(COLORTUP_MAIN_FACE_VERTEX);
     glVertex2i(x_middle, y_start);

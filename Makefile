@@ -1,6 +1,6 @@
 
 all: compile
-	./comp/game 20 20 --func=heur --print
+	./comp/game 20 20 --func=dfs --print
 
 compile: src/game.cpp
 	gcc ./src/game.cpp -o ./comp/game -lglut -lGLU -lGL -lm -lstdc++
