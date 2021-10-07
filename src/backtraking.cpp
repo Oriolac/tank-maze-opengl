@@ -1,25 +1,15 @@
 #include <cstdio>
 #include <vector>
 #include <iostream>
-#include <unistd.h>
 #include "utils/GraphInterface.h"
 
 class GraphDfsHeur : public GraphInterface {
 public:
-    int cols;
-    int rows;
-    std::vector<std::pair<int, int>> directions;
+
     std::vector<std::vector<char>> maze;
 
     GraphDfsHeur(int cols, int rows) : GraphInterface(cols, rows) {
-        this->cols = cols;
-        this->rows = rows;
-        this->directions = {
-                std::pair<int, int>(1, 0),
-                std::pair<int, int>(-1, 0),
-                std::pair<int, int>(0, 1),
-                std::pair<int, int>(0, -1)
-        };
+
     }
 
     void initMaze();
@@ -47,8 +37,9 @@ private:
 
     bool checkDownLeftCorner(std::pair<int, int> next_node);
 
-    std::pair<int, int>
-    getDirection(std::pair<int, int> curr_direction, std::vector<std::pair<int, int>> possible_directions);
+    std::pair<int, int> getDirection(std::pair<int, int> curr_direction, std::vector<std::pair<int, int>> possible_directions);
+
+    std::vector<std::pair<int, int>> all_directions();
 
     int getCols() override {
         return cols;
@@ -59,6 +50,7 @@ private:
     }
 
     void start() override {
+        srand(time(nullptr));
         initMaze();
         createMaze();
     }
@@ -102,11 +94,9 @@ std::vector<std::vector<char>> GraphDfsHeur::createMaze() {
     this->maze[curr_node.second][curr_node.first] = ' ';
     visited.push_back(curr_node);
     while (visited.size() != 0) {
-        printf("here\n");
         curr_node = visited[visited.size() - 1];
         visited.pop_back();
         possibleDirections = getPossibleNextDirections(curr_node);
-        printf("possible Directions: %i\n", possibleDirections.size());
         if (possibleDirections.size() != 0) {
             curr_direction = getDirection(curr_direction, possibleDirections);
             next_node = {curr_node.first + curr_direction.first, curr_node.second + curr_direction.second};
@@ -115,12 +105,13 @@ std::vector<std::vector<char>> GraphDfsHeur::createMaze() {
             visited.push_back(next_node);
         }
     }
+
     return this->maze;
 }
 
 std::vector<std::pair<int, int>> GraphDfsHeur::getPossibleNextDirections(std::pair<int, int> curr_node) {
     std::vector<std::pair<int, int>> possible_directions;
-    for (std::pair<int, int> direction: this->directions) {
+    for (std::pair<int, int> direction: all_directions()) {
         if (inScope(curr_node, direction) && nextIsWall(curr_node, direction) && checkNoBlocks(curr_node, direction) &&
             randomJoinPaths(curr_node, direction)) {
             possible_directions.push_back(direction);
@@ -129,9 +120,18 @@ std::vector<std::pair<int, int>> GraphDfsHeur::getPossibleNextDirections(std::pa
     return possible_directions;
 }
 
+std::vector<std::pair<int, int>> GraphDfsHeur::all_directions(){
+    return {
+            std::pair<int, int>{1, 0},
+            std::pair<int, int>{-1, 0},
+            std::pair<int, int>{0, 1},
+            std::pair<int, int>{0, -1}
+    };
+}
+
 bool GraphDfsHeur::inScope(std::pair<int, int> curr_node, std::pair<int, int> direction) {
-    return (curr_node.second + direction.second * 2 >= 0) && (curr_node.second + direction.second * 2 < this->cols) &&
-           (curr_node.first + direction.first * 2 >= 0) && (curr_node.first + direction.first * 2 < this->rows);
+    return (curr_node.second + direction.second * 2 >= 0) && (curr_node.second + direction.second * 2 < this->rows) &&
+           (curr_node.first + direction.first * 2 >= 0) && (curr_node.first + direction.first * 2 < this->cols);
 }
 
 bool GraphDfsHeur::randomJoinPaths(std::pair<int, int> curr_node, std::pair<int, int> direction) {

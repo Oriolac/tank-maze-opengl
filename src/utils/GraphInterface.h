@@ -10,8 +10,8 @@ class GraphInterface {
 
 public:
     GraphInterface(int cols, int rows) {
-        this->cols = cols % 2 == 1 ? cols : cols + 1;
-        this->rows = rows % 2 == 1 ? rows : rows + 1;
+        this->cols = cols;
+        this->rows = rows;
     }
 
     [[nodiscard]] std::pair<int, int> get_main_coords() const {
