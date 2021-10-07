@@ -18,3 +18,9 @@ compile-kruskal: src/kruskal.cpp
 test: tests/test.cpp
 	gcc ./tests/test.cpp -o ./tests/comp/test -lstdc++
 	./tests/comp/test
+
+compile-backtraking: src/backtraking.cpp
+	gcc ./src/backtraking.cpp -o ./comp/backtraking -lstdc++
+
+run-backtraking: compile-backtraking
+	./comp/backtraking
