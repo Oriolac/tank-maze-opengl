@@ -41,7 +41,7 @@ TEST(createWithKruskalTest) {
     GraphKruskal g = createLaberinthWithKruskal(1, 1);
     g.printInitial();
     g.start();
-    g.printMaze();
+    g.print();
     return 1;
 }
 

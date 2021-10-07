@@ -34,6 +34,7 @@ public:
     std::pair<int, int> *toCoordinates(int i) {
         return new std::pair<int, int>(i % this->getCols(), i / this->getCols());
     }
+
     virtual void print() = 0;
 
     int cols;
