@@ -78,7 +78,6 @@ std::vector<std::vector<char>> Maze::createMaze(){
             visited.push_back(curr_node);
             visited.push_back(next_node);
         }
-        printMaze();
     }
     return this->maze;
 }
@@ -99,8 +98,8 @@ bool Maze::inScope(std::pair<int,int>curr_node, std::pair<int,int> direction){
 
 bool Maze::randomJoinPaths(std::pair<int, int> curr_node, std::pair<int, int> direction) {
     if (this->maze[curr_node.second + direction.second * 2][curr_node.first + direction.first * 2] == ' '){
-        int res = rand() % 5;
-        if(res <= 4){
+        int res = rand() % 10;
+        if(res < 9){
             return false;
         }
     }
@@ -136,6 +135,8 @@ std::pair<int,int> Maze::getDirection(std::pair<int, int> curr_direction, std::v
     std::vector<std::pair<int,int>> list_directions;
     for (std::pair<int,int> direction : possible_directions){
         if(direction.first == curr_direction.first && direction.second == curr_direction.second){
+            list_directions.push_back(direction);
+            list_directions.push_back(direction);
             list_directions.push_back(direction);
             list_directions.push_back(direction);
         }else{
