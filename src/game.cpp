@@ -1,12 +1,13 @@
 #include <cstdio>
 #include <cstdlib>
-#include "maze/dfs.cpp"
+#include "dfs.cpp"
 #include "utils/dimensions.cpp"
-#include "maze/GraphInterface.h"
+#include "GraphInterface.h"
 #include <GL/glut.h>
 #include "utils/graphics.h"
 #include "Character.cpp"
 #include "Context.cpp"
+#include "backtraking.cpp"
 
 #define SIDE_LENGTH 30
 
@@ -34,7 +35,7 @@ void keyboard(unsigned char c, int x, int y);
 void idle();
 
 int main(int argc, char **argv) {
-    if (argc < 1 || argc > 4) {
+    if (argc < 1 || argc > 5) {
         printf("Usage:\n\t./maze [<rows>=20 <cols>=20 [--func={start, dfsbrave, dfsheur}]]\n");
         exit(0);
     }
@@ -52,13 +53,18 @@ int main(int argc, char **argv) {
         std::string delimiter = "=";
         size_t pos = s.find(delimiter);
         std::string tok = s.substr(0, pos);
-        if (std::equal(tok.begin(), tok.end(), std::string("--func").begin())) {
+        if (std::equal(s.begin(), s.end(), std::string("--print").begin())) {
+            mustPrint = true;
+        } else if (std::equal(tok.begin(), tok.end(), std::string("--func").begin())) {
             s.erase(0, pos + delimiter.length());
             tok = s.substr(0, pos + 1);
-            graphDfs = GraphDFS(dimensions.cols, dimensions.rows);
-            graph = &graphDfs;
-        } else if (std::equal(tok.begin(), tok.end(), std::string("--print").begin())) {
-            mustPrint = true;
+            if (std::equal(tok.begin(), tok.end(), std::string("heur").begin())) {
+                GraphDfsHeur graphHeur = GraphDfsHeur(dimensions.cols, dimensions.rows);
+                graph = &graphHeur;
+            } else if (std::equal(tok.begin(), tok.end(), std::string("dfs").begin())) {
+                graphDfs = GraphDFS(dimensions.cols, dimensions.rows);
+                graph = &graphDfs;
+            }
         } else {
             printf("Usage:\n\t./maze [<rows>=20 <cols>=20 [--func={start, dfsbrave, dfsheur}]]\n");
             exit(0);
