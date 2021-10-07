@@ -77,7 +77,7 @@ void config_opengl(int &argc, char **argv) {
     HEIGHT = SIDE_LENGTH * ROWS;
     glutInitWindowPosition(50, 50);
     glutInitWindowSize(WIDTH, HEIGHT);
-    glutCreateWindow("Maze");
+    glutCreateWindow("GraphDfsHeur");
     glutDisplayFunc(display);
 
     glMatrixMode(GL_PROJECTION);

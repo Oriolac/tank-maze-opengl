@@ -49,10 +49,6 @@ public:
 
     bool contains(set<int> set1, int el);
 
-    pair<int, int> *toCoordinates(int i) override {
-        return new std::pair<int, int>(i % this->getCols(), i / this->getCols());
-    }
-
     int getCols() override {
         return cols;
     }

@@ -1,2 +1,2 @@
-# Tank Maze Game
+# Tank GraphDfsHeur Game
 Made in c++.
