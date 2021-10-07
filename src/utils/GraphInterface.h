@@ -14,16 +14,17 @@ public:
         this->rows = rows;
     }
 
-    [[nodiscard]] std::pair<int, int> get_main_coords() const {
-        return {1, rows-2};
-    }
-    [[nodiscard]] std::pair<int, int> get_enemy_coords() const {
-        return {cols-2, 1};
-    }
-
     virtual void start() = 0;
 
     virtual int getCols() = 0;
+
+
+    std::pair<int, int> get_main_coords() {
+        return {1, getRows()-2};
+    }
+    [[nodiscard]] std::pair<int, int> get_enemy_coords() {
+        return {getCols()-2, 1};
+    }
 
     virtual int getRows() = 0;
 

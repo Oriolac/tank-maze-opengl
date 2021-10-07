@@ -92,6 +92,7 @@ std::vector<std::vector<char>> GraphDfsHeur::createMaze() {
     std::pair<int, int> curr_direction = {-1, 0};
     std::vector<std::pair<int, int>> possibleDirections;
     this->maze[curr_node.second][curr_node.first] = ' ';
+    this->maze[this->rows-2][this->cols-2] = ' ';
     visited.push_back(curr_node);
     while (visited.size() != 0) {
         curr_node = visited[visited.size() - 1];
@@ -135,10 +136,12 @@ bool GraphDfsHeur::inScope(std::pair<int, int> curr_node, std::pair<int, int> di
 }
 
 bool GraphDfsHeur::randomJoinPaths(std::pair<int, int> curr_node, std::pair<int, int> direction) {
-    if (this->maze[curr_node.second + direction.second * 2][curr_node.first + direction.first * 2] == ' ') {
-        int res = rand() % 10;
-        if (res < 9) {
-            return false;
+    if (curr_node.first != this->cols-1 && curr_node.second != this->rows-1){
+        if (this->maze[curr_node.second + direction.second * 2][curr_node.first + direction.first * 2] == ' ') {
+            int res = rand() % 10;
+            if (res < 9) {
+                return false;
+            }
         }
     }
     return true;
