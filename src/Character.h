@@ -79,6 +79,9 @@ public:
         }
     }
 
+    std::pair<int, int> getCoords() {
+        return {this->x, this->y};
+    }
 };
 
 class MainCharacter : public Character {

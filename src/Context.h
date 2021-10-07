@@ -35,6 +35,24 @@ public:
     EnemyCharacter *getEnemyCharacter() const {
         return enemy_character;
     }
+
+    void move(Direction direction) {
+        bool can_move = true;
+        switch (direction) {
+            case Direction::UP:
+                break;
+            case Direction::DOWN:
+                break;
+            case Direction::LEFT:
+                break;
+            case Direction::RIGHT:
+                break;
+            default:
+                return;
+                break;
+        }
+        main_character->move(direction);
+    }
 };
 
 

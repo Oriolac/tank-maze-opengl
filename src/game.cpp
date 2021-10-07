@@ -130,6 +130,7 @@ void keyboard(unsigned char c, int x, int y) {
     switch (c) {
         case 'a':case 'A':
             printf("LEFT\n");
+
             break;
         case 'd':case 'D':
             printf("RIGHT\n");
