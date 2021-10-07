@@ -1,6 +1,7 @@
 #include <cstdio>
 #include <vector>
 #include <iostream>
+#include <unistd.h>
 
 class Maze{
     public:
@@ -30,6 +31,7 @@ class Maze{
         std::vector<std::pair<int,int>> getPossibleNextDirections(std::pair<int,int> curr_node);
         bool inScope(std::pair<int,int>curr_node, std::pair<int,int> direction);
         bool nextIsWall(std::pair<int,int> curr_node, std::pair<int,int> direction);
+        bool randomJoinPaths(std::pair<int,int> curr_node, std::pair<int,int> direction);
         bool checkNoBlocks(std::pair<int,int> curr_node, std::pair<int,int> direction);
         bool checkTopRightCorner(std::pair<int,int> next_node);
         bool checkTopLeftCorner(std::pair<int,int> next_node);
@@ -71,11 +73,12 @@ std::vector<std::vector<char>> Maze::createMaze(){
         possibleDirections = getPossibleNextDirections(curr_node);
         if(possibleDirections.size() != 0){
             curr_direction = getDirection(curr_direction, possibleDirections);
-            next_node = {curr_node.first + curr_direction.second, curr_node.first + curr_direction.second};
+            next_node = {curr_node.first + curr_direction.first, curr_node.second + curr_direction.second};
             this->maze[next_node.second][next_node.first] = ' ';
             visited.push_back(curr_node);
             visited.push_back(next_node);
         }
+        printMaze();
     }
     return this->maze;
 }
@@ -83,7 +86,7 @@ std::vector<std::vector<char>> Maze::createMaze(){
 std::vector<std::pair<int,int>> Maze::getPossibleNextDirections(std::pair<int,int> curr_node){
     std::vector<std::pair<int,int>> possible_directions;
     for (std::pair<int,int> direction : this->directions){
-        if (inScope(curr_node, direction) && nextIsWall(curr_node, direction) && checkNoBlocks(curr_node, direction)){
+        if (inScope(curr_node, direction) && nextIsWall(curr_node, direction) && checkNoBlocks(curr_node, direction) && randomJoinPaths(curr_node, direction)){
             possible_directions.push_back(direction);
         }
     }
@@ -92,6 +95,16 @@ std::vector<std::pair<int,int>> Maze::getPossibleNextDirections(std::pair<int,in
 
 bool Maze::inScope(std::pair<int,int>curr_node, std::pair<int,int> direction){
     return (curr_node.second + direction.second * 2 >= 0) && (curr_node.second + direction.second * 2 < this->cols) && (curr_node.first + direction.first * 2 >= 0) && (curr_node.first + direction.first * 2 < this->rows);
+}
+
+bool Maze::randomJoinPaths(std::pair<int, int> curr_node, std::pair<int, int> direction) {
+    if (this->maze[curr_node.second + direction.second * 2][curr_node.first + direction.first * 2] == ' '){
+        int res = rand() % 5;
+        if(res <= 4){
+            return false;
+        }
+    }
+    return true;
 }
 
 bool Maze::nextIsWall(std::pair<int,int> curr_node, std::pair<int,int> direction){
@@ -129,7 +142,7 @@ std::pair<int,int> Maze::getDirection(std::pair<int, int> curr_direction, std::v
             list_directions.push_back(direction);
         }
     }
-    int res = rand() % (list_directions.size()-1);
+    int res = rand() % list_directions.size();
     return list_directions[res];
 }
 
