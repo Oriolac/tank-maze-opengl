@@ -78,16 +78,22 @@ public:
             direction = Direction::QUIET;
         }
     }
+
 };
 
 class MainCharacter : public Character {
 public:
     MainCharacter(pair<int, int> coords, int tile_side_length);
+
+    void draw();
 };
 
 class EnemyCharacter : public Character {
 public:
     EnemyCharacter(pair<int, int> coords, int tile_side_length);
+
+    void draw();
+
 };
 
 

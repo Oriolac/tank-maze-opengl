@@ -6,11 +6,13 @@
 #include <GL/glut.h>
 #include "utils/graphics.h"
 #include "Character.cpp"
+#include "Context.cpp"
 
 #define SIDE_LENGTH 30
 
 #define BACKGROUND_COLOR 0.75, 0.75, 0.9, 0.0
 
+Context *context;
 GraphInterface *graph;
 int COLUMNS;
 int ROWS;
@@ -86,6 +88,10 @@ void config_opengl(int &argc, char **argv) {
     glMatrixMode(GL_PROJECTION);
     gluOrtho2D(0, WIDTH - 1, 0, HEIGHT - 1);
 
+    MainCharacter main_character = MainCharacter(graph->get_main_coords(), SIDE_LENGTH);
+    EnemyCharacter enemy_character = EnemyCharacter(graph->get_enemy_coords(), SIDE_LENGTH);
+    Context new_cont = Context(graph, &main_character, &enemy_character);
+    context = &new_cont;
     glutMainLoop();
 }
 
@@ -97,8 +103,8 @@ void display() {
 }
 
 void characters_display() {
-    MainCharacter main_character = MainCharacter(graph->get_main_coords(), SIDE_LENGTH);
-    EnemyCharacter enemy_character = EnemyCharacter(graph->get_enemy_coords(), SIDE_LENGTH);
+    context->getMainCharacter()->draw();
+    context->getEnemyCharacter()->draw();
 }
 
 
@@ -141,7 +147,7 @@ void keyboard(unsigned char c, int x, int y) {
 };
 
 void idle() {
-    t=glutGet(GLUT_ELAPSED_TIME);
+    int t=glutGet(GLUT_ELAPSED_TIME);
 
 }
 

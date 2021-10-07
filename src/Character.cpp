@@ -6,6 +6,10 @@
 #include "utils/graphics.h"
 
 MainCharacter::MainCharacter(std::pair<int, int> coords, int tile_side_length) : Character(coords, tile_side_length) {
+    draw();
+}
+
+void MainCharacter::draw() {
     glBegin(GL_TRIANGLES);
     glColor3f(COLORTUP_MAIN_FACE_VERTEX);
     glVertex2i(x_middle, y_start);
@@ -17,6 +21,10 @@ MainCharacter::MainCharacter(std::pair<int, int> coords, int tile_side_length) :
 }
 
 EnemyCharacter::EnemyCharacter(pair<int, int> coords, int tile_side_length) : Character(coords, tile_side_length) {
+    draw();
+}
+
+void EnemyCharacter::draw() {
     glBegin(GL_TRIANGLES);
     glColor3f(COLORTUP_ENEMY_FACE_VERTEX);
     glVertex2i(x_middle, y_finish);
