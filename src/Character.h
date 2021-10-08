@@ -2,7 +2,7 @@
 // Created by oriol on 10/6/21.
 //
 
-#define TIME_REMAINING 1000
+#define TIME_REMAINING 500
 
 #ifndef TANK_MAZE_CHARACTER_H
 #define TANK_MAZE_CHARACTER_H
@@ -56,18 +56,22 @@ public:
                 case Direction::UP:
                     this->vX = 0;
                     this->vY = (double) tile_side_length / TIME_REMAINING;
+                    this->yTile = yTile + 1;
                     break;
                 case Direction::DOWN:
                     this->vX = 0;
                     this->vY = - (double) tile_side_length / TIME_REMAINING;
+                    this->yTile = yTile - 1;
                     break;
                 case Direction::LEFT:
                     this->vX = - (double)tile_side_length / TIME_REMAINING;
                     this->vY = 0;
+                    this->xTile = xTile - 1;
                     break;
                 case Direction::RIGHT:
                     this->vX = (double) tile_side_length / TIME_REMAINING;
                     this->vY = 0;
+                    this->xTile = xTile + 1;
                     break;
                 default:
                     break;
@@ -86,7 +90,7 @@ public:
             this->y = y + vY * t;
             printf("ENTER INTEGRATE, %f %f, VEL(%f, %f)\n", x, y, vX, vY);
             this->time_remaining_movement -= t;
-        } else if (direction != Direction::QUIET) {
+        } else if (direction != Direction::QUIET && t >= this->time_remaining_movement) {
             this->x = x + vX * this->time_remaining_movement;
             this->y = y + vY * this->time_remaining_movement;
             this->direction = Direction::QUIET;
