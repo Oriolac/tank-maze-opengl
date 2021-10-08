@@ -31,6 +31,7 @@ EnemyCharacter::EnemyCharacter(pair<int, int> coords, int tile_side_length) : Ch
 }
 
 void EnemyCharacter::draw() {
+    update_state();
     glBegin(GL_TRIANGLES);
     glColor3f(COLORTUP_ENEMY_FACE_VERTEX);
     glVertex2i(x_middle, y_finish);
