@@ -143,6 +143,16 @@ bool GraphDfsHeur::randomJoinPaths(std::pair<int, int> curr_node, std::pair<int,
                 return false;
             }
         }
+    }else{
+        if(curr_node.second == this->rows-1){
+            if (this->maze[this->rows-1][this->cols-2] == ' ' && this->maze[this->rows-2][this->cols-2] == ' '){
+                return false;
+            }
+        }else if(curr_node.first == this->cols-1){
+            if (this->maze[this->rows-2][this->cols-1] == ' ' && this->maze[this->rows-2][this->cols-2] == ' '){
+                return false;
+            }
+        }
     }
     return true;
 }
