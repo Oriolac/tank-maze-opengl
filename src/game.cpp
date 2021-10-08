@@ -44,6 +44,8 @@ bool get_opt_args(int argc, char *const *argv, const Dimensions &dimensions);
 
 void create_position_observer(int anglealpha, int anglebeta, int radi);
 
+void addPath(int i, int j, Color color);
+
 int main(int argc, char **argv) {
     if (argc < 4 || argc > 5) {
         printf("Usage:\n\t./game [<rows>=20 <cols>=20 --func={dfs, heur} [--print]]\n");
@@ -137,17 +139,19 @@ void maze_display() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
-    create_position_observer(anglealpha, anglebeta, 700);
+    create_position_observer(anglealpha, anglebeta, 1000);
 
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    glOrtho(-WIDTH, WIDTH - 1, -HEIGHT, HEIGHT - 1, 10, 2000);
+    glOrtho(-WIDTH*2/3, WIDTH*2/3, -HEIGHT*2/3, HEIGHT*2/3, 10, 2000);
     for (int tile_count = 0; tile_count < COLUMNS * ROWS; tile_count++) {
+        pair<int, int> *coords = graph->toCoordinates(tile_count);
+        i = coords->first;
+        j = coords->second;
         if (graph->is_wall(tile_count)) {
-            pair<int, int> *coords = graph->toCoordinates(tile_count);
-            i = coords->first;
-            j = coords->second;
-            addSquare(i, j, COLOR_WALL, 20);
+            addSquare(i, j, COLOR_WALL, 10);
+        } else {
+            addPath(i, j, COLOR_PATH);
         }
     }
     pair<int, int> initial_pos = graph->get_main_coords();
@@ -186,7 +190,7 @@ void create_position_observer(int alpha, int beta, int radi) {
     upy = upy / modul;
     upz = upz / modul;
 
-    gluLookAt(x, y, z, 0.0, 0.0, 0.0, upx, upy, upz);
+    gluLookAt(x, y, z, WIDTH / 2, HEIGHT / 2, 0.0, upx, upy, upz);
 }
 
 void keyboard(unsigned char c, int x, int y) {
@@ -212,7 +216,7 @@ void keyboard(unsigned char c, int x, int y) {
                 anglebeta = (anglebeta + 3);
             break;
         case 'k':
-            if (anglebeta <= (-90 + 4))
+            if (anglebeta >= (-90 + 4))
                 anglebeta = (anglebeta - 3);
             break;
         case 'j':
@@ -295,5 +299,26 @@ void addSquare(int i, int j, struct Color color, int height) {
     glVertex3i((i + 1) * WIDTH / COLUMNS, (j + 1) * HEIGHT / ROWS, height);
     glEnd();
 
+}
 
+void addPath(int i, int j, Color color) {
+    glMatrixMode(GL_MODELVIEW);
+    glPolygonMode(GL_FRONT, GL_FILL);
+    glPolygonMode(GL_BACK, GL_LINE);
+    glColor3f(color.red, color.green, color.blue);
+    glBegin(GL_QUADS);
+
+    glVertex3i(i * WIDTH / COLUMNS, j * HEIGHT / ROWS, -1);
+    glVertex3i((i + 1) * WIDTH / COLUMNS, j * HEIGHT / ROWS, -1);
+    glVertex3i((i + 1) * WIDTH / COLUMNS, (j + 1) * HEIGHT / ROWS, -1);
+    glVertex3i(i * WIDTH / COLUMNS, (j + 1) * HEIGHT / ROWS, -1);
+
+    glBegin(GL_QUADS);
+    glVertex3i(i * WIDTH / COLUMNS, j * HEIGHT / ROWS, -1);
+    glVertex3i(i * WIDTH / COLUMNS, (j + 1) * HEIGHT / ROWS, -1);
+    glVertex3i((i + 1) * WIDTH / COLUMNS, (j + 1) * HEIGHT / ROWS, -1);
+    glVertex3i((i + 1) * WIDTH / COLUMNS, j * HEIGHT / ROWS, -1);
+    glEnd();
+
+    glEnd();
 }
