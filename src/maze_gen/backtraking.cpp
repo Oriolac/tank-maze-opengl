@@ -9,7 +9,8 @@ public:
     std::vector<std::vector<char>> maze;
 
     GraphDfsHeur(int cols, int rows) : GraphInterface(cols, rows) {
-
+        this->cols = cols;
+        this->rows = rows;
     }
 
     void initMaze();
@@ -18,7 +19,21 @@ public:
 
     void print() override;
 
+    int getCols() override;
+
+    int getRows() override;
+
+    int getNumTiles() override;
+
+    bool is_wall(int i) override;
+
+    void start() override;
+
+    int cols;
+    int rows;
+
 private:
+
     std::vector<std::pair<int, int>> getPossibleNextDirections(std::pair<int, int> curr_node);
 
     bool inScope(std::pair<int, int> curr_node, std::pair<int, int> direction);
@@ -41,30 +56,30 @@ private:
 
     std::vector<std::pair<int, int>> all_directions();
 
-    int getCols() override {
-        return cols;
-    }
-
-    int getRows() override {
-        return rows;
-    }
-
-    void start() override {
-        srand(time(nullptr));
-        initMaze();
-        createMaze();
-    }
-
-    int getNumTiles() override {
-        return this->getRows() * this->getCols();
-    }
-
-    bool is_wall(int i) override {
-        std::pair<int, int> *coords = toCoordinates(i);
-        return maze[coords->second][coords->first] == '#';
-    }
-
 };
+
+int GraphDfsHeur::getCols() {
+    return cols;
+}
+
+int GraphDfsHeur::getRows() {
+    return rows;
+}
+
+int GraphDfsHeur::getNumTiles() {
+    return this->getRows() * this->getCols();
+}
+
+bool GraphDfsHeur::is_wall(int i) {
+    std::pair<int, int> *coords = toCoordinates(i);
+    return maze[coords->second][coords->first] == '#';
+}
+
+void GraphDfsHeur::start() {
+    srand(time(nullptr));
+    initMaze();
+    createMaze();
+}
 
 void GraphDfsHeur::initMaze() {
     for (int i = 0; i < this->rows; i++) {
@@ -140,6 +155,16 @@ bool GraphDfsHeur::randomJoinPaths(std::pair<int, int> curr_node, std::pair<int,
         if (this->maze[curr_node.second + direction.second * 2][curr_node.first + direction.first * 2] == ' ') {
             int res = rand() % 10;
             if (res < 9) {
+                return false;
+            }
+        }
+    }else{
+        if(curr_node.second == this->rows-1){
+            if (this->maze[this->rows-1][this->cols-2] == ' ' && this->maze[this->rows-2][this->cols-2] == ' '){
+                return false;
+            }
+        }else if(curr_node.first == this->cols-1){
+            if (this->maze[this->rows-2][this->cols-1] == ' ' && this->maze[this->rows-2][this->cols-2] == ' '){
                 return false;
             }
         }

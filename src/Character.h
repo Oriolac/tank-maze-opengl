@@ -48,10 +48,8 @@ public:
     };
 
     void move(Direction new_direction) {
-        printf("Direction : %i == %i\n", direction, Direction::QUIET);
         if (direction == Direction::QUIET) {
             direction = new_direction;
-            printf("NEWDirection : %i != %i\n", new_direction, Direction::QUIET);
             switch (new_direction) {
                 case Direction::UP:
                     this->vX = 0;
@@ -76,11 +74,7 @@ public:
                 default:
                     break;
             }
-            printf("tileSideLength: %i\n", tile_side_length);
-            printf("TIME REMAINING: %i\n", TIME_REMAINING);
-            printf("VEL(%f %f)\n", vX, vY);
             time_remaining_movement = TIME_REMAINING;
-            printf("HAS CHANGED: %i\n", time_remaining_movement);
         }
     };
 
@@ -88,7 +82,6 @@ public:
         if (direction != Direction::QUIET && t < this->time_remaining_movement) {
             this->x = x + vX * t;
             this->y = y + vY * t;
-            printf("ENTER INTEGRATE, %f %f, VEL(%f, %f)\n", x, y, vX, vY);
             this->time_remaining_movement -= t;
         } else if (direction != Direction::QUIET && t >= this->time_remaining_movement) {
             this->x = x + vX * this->time_remaining_movement;

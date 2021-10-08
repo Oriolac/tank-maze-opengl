@@ -1,20 +1,21 @@
 #include <cstdio>
 #include <cstdlib>
-#include "dfs.cpp"
+#include "maze_gen/dfs.cpp"
 #include "utils/dimensions.cpp"
-#include "GraphInterface.h"
+#include "maze_gen/GraphInterface.h"
 #include <GL/glut.h>
 #include "utils/graphics.h"
 #include "Character.cpp"
 #include "Context.cpp"
-#include "backtraking.cpp"
+#include "maze_gen/backtraking.cpp"
+#include <memory>
 
 #define SIDE_LENGTH 30
 
 #define BACKGROUND_COLOR 0.75, 0.75, 0.9, 0.0
 
 Context *context;
-GraphInterface *graph;
+std::shared_ptr<GraphInterface> graph;
 int COLUMNS;
 int ROWS;
 int WIDTH;
@@ -37,19 +38,12 @@ void keyboard(unsigned char c, int x, int y);
 void idle();
 
 int main(int argc, char **argv) {
-    if (argc < 1 || argc > 5) {
-        printf("Usage:\n\t./maze [<rows>=20 <cols>=20 [--func={start, dfsbrave, dfsheur}]]\n");
+    if (argc < 4 || argc > 5) {
+        printf("Usage:\n\t./game [<rows>=20 <cols>=20 --func={dfs, heur} [--print]]\n");
         exit(0);
     }
     Dimensions dimensions = getDimensions(argc, argv);
     bool mustPrint = false;
-    GraphDFS graphDfs = GraphDFS(dimensions.cols, dimensions.rows);
-    graph = static_cast<GraphInterface *>(malloc(sizeof(GraphDFS)));
-    if (!graph) {
-        printf("malloc failed\n");
-        exit(-1);
-    }
-    graph = &graphDfs;
     for (int i = 3; i < argc; i++) {
         std::string s = argv[i];
         std::string delimiter = "=";
@@ -62,13 +56,21 @@ int main(int argc, char **argv) {
             tok = s.substr(0, pos + 1);
             if (std::equal(tok.begin(), tok.end(), std::string("heur").begin())) {
                 GraphDfsHeur graphHeur = GraphDfsHeur(dimensions.cols, dimensions.rows);
-                graph = &graphHeur;
+                graph = std::make_shared<GraphDfsHeur>(graphHeur);
+                if (!graph) {
+                    printf("malloc failed\n");
+                    exit(-1);
+                }
             } else if (std::equal(tok.begin(), tok.end(), std::string("dfs").begin())) {
-                graphDfs = GraphDFS(dimensions.cols, dimensions.rows);
-                graph = &graphDfs;
+                GraphDfsHeur graphHeur = GraphDfsHeur(dimensions.cols, dimensions.rows);
+                graph = std::make_shared<GraphDfsHeur>(graphHeur);
+                if (!graph) {
+                    printf("malloc failed\n");
+                    exit(-1);
+                }
             }
         } else {
-            printf("Usage:\n\t./maze [<rows>=20 <cols>=20 [--func={start, dfsbrave, dfsheur}]]\n");
+            printf("Usage:\n\t./game [<rows>=20 <cols>=20 --func={dfs, heur} [--print]]\n");
             exit(0);
         }
     }
@@ -139,21 +141,17 @@ void keyboard(unsigned char c, int x, int y) {
         case 'a':
         case 'A':
             context->move(Direction::LEFT);
-            printf("LEFT\n");
             break;
         case 'd':
         case 'D':
-            printf("RIGHT\n");
             context->move(Direction::RIGHT);
             break;
         case 'w':
         case 'W':
-            printf("UP\n");
             context->move(Direction::UP);
             break;
         case 's':
         case 'S':
-            printf("DOWN\n");
             context->move(Direction::DOWN);
             break;
         default:
