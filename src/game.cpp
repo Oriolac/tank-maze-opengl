@@ -157,15 +157,19 @@ void keyboard(unsigned char c, int x, int y) {
         default:
             break;
     }
+    printf("Hola\n");
+    Direction dir = static_cast<Direction>(rand() % 4);
+    context ->move_enemy(dir);
     glutPostRedisplay();
 };
 
 void idle() {
     int t = glutGet(GLUT_ELAPSED_TIME);
-    if (last_t == 0)
+    if (last_t == 0) {
         last_t = t;
-    else {
+    }else {
         context->getMainCharacter()->integrate(t -  last_t);
+        context->getEnemyCharacter()->integrate(t - last_t);
         last_t = t;
     }
     glutPostRedisplay();
