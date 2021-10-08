@@ -37,6 +37,8 @@ void keyboard(unsigned char c, int x, int y);
 
 void idle();
 
+bool get_opt_args(int argc, char *const *argv, const Dimensions &dimensions);
+
 int main(int argc, char **argv) {
     if (argc < 4 || argc > 5) {
         printf("Usage:\n\t./game [<rows>=20 <cols>=20 --func={dfs, heur} [--print]]\n");
@@ -44,26 +46,39 @@ int main(int argc, char **argv) {
     }
     Dimensions dimensions = getDimensions(argc, argv);
     bool mustPrint = false;
+    mustPrint = get_opt_args(argc, argv, dimensions);
+    graph->start();
+    if (mustPrint)
+        graph->print();
+    MainCharacter main_character = MainCharacter(graph->get_main_coords(), SIDE_LENGTH);
+    EnemyCharacter enemy_character = EnemyCharacter(graph->get_enemy_coords(), SIDE_LENGTH);
+    Context new_cont = Context(graph, &main_character, &enemy_character);
+    context = &new_cont;
+    config_opengl(argc, argv);
+}
+
+bool get_opt_args(int argc, char *const *argv, const Dimensions &dimensions) {
+    bool mustPrint;
     for (int i = 3; i < argc; i++) {
-        std::string s = argv[i];
-        std::string delimiter = "=";
+        string s = argv[i];
+        string delimiter = "=";
         size_t pos = s.find(delimiter);
-        std::string tok = s.substr(0, pos);
-        if (std::equal(s.begin(), s.end(), std::string("--print").begin())) {
+        string tok = s.substr(0, pos);
+        if (equal(s.begin(), s.end(), string("--print").begin())) {
             mustPrint = true;
-        } else if (std::equal(tok.begin(), tok.end(), std::string("--func").begin())) {
+        } else if (equal(tok.begin(), tok.end(), string("--func").begin())) {
             s.erase(0, pos + delimiter.length());
             tok = s.substr(0, pos + 1);
-            if (std::equal(tok.begin(), tok.end(), std::string("heur").begin())) {
+            if (equal(tok.begin(), tok.end(), string("heur").begin())) {
                 GraphDfsHeur graphHeur = GraphDfsHeur(dimensions.cols, dimensions.rows);
-                graph = std::make_shared<GraphDfsHeur>(graphHeur);
+                graph = make_shared<GraphDfsHeur>(graphHeur);
                 if (!graph) {
                     printf("malloc failed\n");
                     exit(-1);
                 }
-            } else if (std::equal(tok.begin(), tok.end(), std::string("dfs").begin())) {
-                GraphDfsHeur graphHeur = GraphDfsHeur(dimensions.cols, dimensions.rows);
-                graph = std::make_shared<GraphDfsHeur>(graphHeur);
+            } else if (equal(tok.begin(), tok.end(), string("dfs").begin())) {
+                GraphDFS graphDfs = GraphDFS(dimensions.cols, dimensions.rows);
+                graph = make_shared<GraphDFS>(graphDfs);
                 if (!graph) {
                     printf("malloc failed\n");
                     exit(-1);
@@ -74,14 +89,7 @@ int main(int argc, char **argv) {
             exit(0);
         }
     }
-    graph->start();
-    if (mustPrint)
-        graph->print();
-    MainCharacter main_character = MainCharacter(graph->get_main_coords(), SIDE_LENGTH);
-    EnemyCharacter enemy_character = EnemyCharacter(graph->get_enemy_coords(), SIDE_LENGTH);
-    Context new_cont = Context(graph, &main_character, &enemy_character);
-    context = &new_cont;
-    config_opengl(argc, argv);
+    return mustPrint;
 }
 
 void config_opengl(int &argc, char **argv) {
