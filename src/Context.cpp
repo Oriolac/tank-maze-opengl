@@ -11,6 +11,17 @@ void Context::move(Direction direction) {
     }
 }
 
+void Context::move_enemy(Direction direction) {
+    std::pair<int, int> coords = enemy_character->getCoords();
+    printf("enemy from (%i, %i)\n", coords.first, coords.second);
+    if (check_can_move(direction, coords)){
+        enemy_character->move(direction);
+    }
+    std::pair<int, int> coordsTo = enemy_character->getCoords();
+    printf("enemy to (%i, %i)\n", coordsTo.first, coordsTo.second);
+
+}
+
 bool Context::check_can_move(const Direction &direction, const pair<int, int> &coords) {
     bool can_move;
     switch (direction) {
