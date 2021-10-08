@@ -95,19 +95,19 @@ bool get_opt_args(int argc, char *const *argv, const Dimensions &dimensions) {
 void config_opengl(int &argc, char **argv) {
     COLUMNS = graph->getCols();
     ROWS = graph->getRows();
-    glutInit(&argc, argv);
-    glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB);
     WIDTH = SIDE_LENGTH * COLUMNS;
     HEIGHT = SIDE_LENGTH * ROWS;
+    glutInit(&argc, argv);
+    glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB| GLUT_DEPTH);
     glutInitWindowPosition(50, 50);
     glutInitWindowSize(WIDTH, HEIGHT);
     glutCreateWindow("GraphDfsHeur");
+    glEnable(GL_DEPTH_TEST);
+
     glutDisplayFunc(display);
     glutKeyboardFunc(keyboard);
     glutIdleFunc(idle);
 
-    glMatrixMode(GL_PROJECTION);
-    gluOrtho2D(0, WIDTH - 1, 0, HEIGHT - 1);
 
 
     glutMainLoop();
