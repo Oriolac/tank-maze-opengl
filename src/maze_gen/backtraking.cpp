@@ -151,7 +151,7 @@ bool GraphDfsHeur::inScope(std::pair<int, int> curr_node, std::pair<int, int> di
 }
 
 bool GraphDfsHeur::randomJoinPaths(std::pair<int, int> curr_node, std::pair<int, int> direction) {
-    if (curr_node.first != this->cols-1 && curr_node.second != this->rows-1){
+    if (curr_node.first != this->cols-2 && curr_node.second != this->rows-2){
         if (this->maze[curr_node.second + direction.second * 2][curr_node.first + direction.first * 2] == ' ') {
             int res = rand() % 10;
             if (res < 9) {
@@ -159,12 +159,12 @@ bool GraphDfsHeur::randomJoinPaths(std::pair<int, int> curr_node, std::pair<int,
             }
         }
     }else{
-        if(curr_node.second == this->rows-1){
-            if (this->maze[this->rows-1][this->cols-2] == ' ' && this->maze[this->rows-2][this->cols-2] == ' '){
+        if(curr_node.second == this->rows-2){
+            if (this->maze[this->rows-2][this->cols-3] == ' ' && this->maze[this->rows-3][this->cols-3] == ' '){
                 return false;
             }
-        }else if(curr_node.first == this->cols-1){
-            if (this->maze[this->rows-2][this->cols-1] == ' ' && this->maze[this->rows-2][this->cols-2] == ' '){
+        }else if(curr_node.first == this->cols-2){
+            if (this->maze[this->rows-3][this->cols-2] == ' ' && this->maze[this->rows-3][this->cols-3] == ' '){
                 return false;
             }
         }

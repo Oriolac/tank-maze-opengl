@@ -76,5 +76,4 @@ int main() {
     ADD(isAroundKruskalGraphTest);
     ADD(toCoordinatesTest);
     ADD(toPositionKruskalTest);
-    printf("All okey!\n");
 }
