@@ -18,11 +18,11 @@ void MainCharacter::draw() {
     update_state();
     glBegin(GL_TRIANGLES);
     glColor3f(COLORTUP_MAIN_FACE_VERTEX);
-    glVertex2i(x_middle, y_start);
+    glVertex3i(x_middle, y_start, 0);
     glColor3f(COLORTUP_MAIN_BACK_VERTEX);
-    glVertex2i(x_finish, y_finish);
+    glVertex3i(x_finish, y_finish, 0);
     glColor3f(COLORTUP_MAIN_BACK_VERTEX);
-    glVertex2i(x_start, y_finish);
+    glVertex3i(x_start, y_finish, 0);
     glEnd();
 }
 
@@ -32,12 +32,15 @@ EnemyCharacter::EnemyCharacter(pair<int, int> coords, int tile_side_length) : Ch
 
 void EnemyCharacter::draw() {
     update_state();
+    glMatrixMode(GL_MODELVIEW);
+    glPolygonMode(GL_FRONT, GL_FILL);
+    glPolygonMode(GL_BACK, GL_LINE);
     glBegin(GL_TRIANGLES);
     glColor3f(COLORTUP_ENEMY_FACE_VERTEX);
-    glVertex2i(x_middle, y_finish);
+    glVertex3i(x_middle, y_finish, 0);
     glColor3f(COLORTUP_ENEMY_BACK_VERTEX);
-    glVertex2i(x_finish, y_start);
+    glVertex3i(x_start, y_start, 0);
     glColor3f(COLORTUP_ENEMY_BACK_VERTEX);
-    glVertex2i(x_start, y_start);
+    glVertex3i(x_finish, y_start, 0);
     glEnd();
 }
