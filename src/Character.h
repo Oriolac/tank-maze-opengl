@@ -2,7 +2,8 @@
 // Created by oriol on 10/6/21.
 //
 
-#define TIME_REMAINING 500
+#define TIME_REMAINING_MAIN 200
+#define TIME_REMAINING_ENEMY 200
 
 #ifndef TANK_MAZE_CHARACTER_H
 #define TANK_MAZE_CHARACTER_H
@@ -53,28 +54,28 @@ public:
             switch (new_direction) {
                 case Direction::UP:
                     this->vX = 0;
-                    this->vY = (double) tile_side_length / TIME_REMAINING;
+                    this->vY = (double) tile_side_length / time_remain();
                     this->yTile = yTile + 1;
                     break;
                 case Direction::DOWN:
                     this->vX = 0;
-                    this->vY = - (double) tile_side_length / TIME_REMAINING;
+                    this->vY = - (double) tile_side_length / time_remain();
                     this->yTile = yTile - 1;
                     break;
                 case Direction::LEFT:
-                    this->vX = - (double)tile_side_length / TIME_REMAINING;
+                    this->vX = - (double)tile_side_length / time_remain();
                     this->vY = 0;
                     this->xTile = xTile - 1;
                     break;
                 case Direction::RIGHT:
-                    this->vX = (double) tile_side_length / TIME_REMAINING;
+                    this->vX = (double) tile_side_length / time_remain();
                     this->vY = 0;
                     this->xTile = xTile + 1;
                     break;
                 default:
                     break;
             }
-            time_remaining_movement = TIME_REMAINING;
+            time_remaining_movement = time_remain();
         }
     };
 
@@ -91,6 +92,8 @@ public:
     }
 
     pair<int, int> getCoords();
+
+    [[nodiscard]] virtual int time_remain() const = 0;
 };
 
 class MainCharacter : public Character {
@@ -98,6 +101,10 @@ public:
     MainCharacter(pair<int, int> coords, int tile_side_length);
 
     void draw();
+
+    [[nodiscard]] int time_remain() const override {
+        return TIME_REMAINING_MAIN;
+    }
 };
 
 class EnemyCharacter : public Character {
@@ -105,6 +112,10 @@ public:
     EnemyCharacter(pair<int, int> coords, int tile_side_length);
 
     void draw();
+
+    [[nodiscard]] int time_remain() const override {
+        return TIME_REMAINING_ENEMY;
+    }
 
 };
 

@@ -33,7 +33,7 @@ public:
 
     void move_enemy(Direction direction);
 
-    bool check_can_move(const Direction &direction, const pair<int, int> &coords);
+    bool check_can_move(const Direction &direction, const pair<int, int> &coords, Character *pCharacter);
 };
 
 

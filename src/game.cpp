@@ -157,9 +157,6 @@ void keyboard(unsigned char c, int x, int y) {
         default:
             break;
     }
-    printf("Hola\n");
-    Direction dir = static_cast<Direction>(rand() % 4);
-    context ->move_enemy(dir);
     glutPostRedisplay();
 };
 
@@ -172,6 +169,8 @@ void idle() {
         context->getEnemyCharacter()->integrate(t - last_t);
         last_t = t;
     }
+    Direction dir = static_cast<Direction>(rand() % 5);
+    context ->move_enemy(dir);
     glutPostRedisplay();
 }
 
