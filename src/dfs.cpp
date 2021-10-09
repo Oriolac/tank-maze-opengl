@@ -18,13 +18,11 @@ private:
     std::set<int> paths;
 public:
     GraphDFS(int cols, int rows) : GraphInterface(cols, rows) {
-        this->cols = cols % 2 == 1 ? cols : cols + 1;
-        this->rows = rows % 2 == 1 ? rows : rows + 1;
+        this->cols = cols;
+        this->rows = rows;
     }
 
     void reset_grid();
-
-    int to_pos(int x, int y);
 
     int is_in_bounds(int x, int y);
 
@@ -37,13 +35,54 @@ public:
         reset_grid();
         this->dfs(1, 1);
         this->add_extra_paths();
+        if (this->getCols() % 2 == 0) {
+            int lastCol = getCols() - 2;
+            add_union_path_to_enemy_point(lastCol, getRows() - 3);
+            for (int j = 1; j < getRows() - 3; j++) {
+                int pos = to_pos(lastCol, j);
+                int posup = to_pos(lastCol, j - 1);
+                int posdown = to_pos(lastCol, j + 1);
+                int posleft = to_pos(lastCol - 1, j);
+                bool all_walls = is_wall(posup) && is_wall(posdown) && !is_wall(posleft);
+                bool no_center_wall = is_wall(posleft) && !is_wall(posup);
+                if ((all_walls && rand() % 3 != 0) || (no_center_wall)) {
+                    grid[pos] = ' ';
+                    paths.insert(pos);
+                }
+            }
+        }
+        if (this->getRows() % 2 == 0) {
+            int lastRow = getRows() - 2;
+            for (int i = 1; i < getCols() - 3; i++) {
+                int pos = to_pos(i, lastRow);
+                int posleft = to_pos(i - 1, lastRow);
+                int posright = to_pos(i + 1, lastRow);
+                int posup = to_pos(i, lastRow - 1);
+                if (is_wall(posleft) && is_wall(posright) && !is_wall(posup) && rand() % 2 == 0) {
+                    grid[pos] = ' ';
+                    paths.insert(pos);
+                }
+            }
+        }
+    }
+
+    void add_union_path_to_enemy_point(int union_x, int union_y) {
+        int pos = to_pos(getCols() - 2, getRows() - 2);
+        grid[pos] = ' ';
+        paths.insert(pos);
+        int posfinal_left = to_pos(getCols() - 3, getRows() - 2);
+        if (is_wall(posfinal_left)) {
+            pos = to_pos(union_x, union_y);
+            grid[pos] = ' ';
+            paths.insert(pos);
+        }
     }
 
     int getNumTiles() override {
         return getCols() * getRows();
     }
 
-    bool isWall(int i) override {
+    bool is_wall(int i) override {
         return !contains(paths, i);
     }
 
@@ -65,24 +104,28 @@ public:
 
     int cols;
     int rows;
+
+    bool are_coords_on_frame_walls(const pair<int, int> *coords);
+
+    bool check_can_be_path_near_xframe_walls(int tile);
 };
 
 void GraphDFS::reset_grid() {
     for (int i = 0; i < getCols() * getRows(); ++i) {
         grid[i] = '#';
     }
+    if (getRows() % 2 == 0) {
+        int pos = to_pos(getCols() - 2, getRows() - 2);
+        grid[pos] = ' ';
+        paths.insert(pos);
+    }
 }
 
-int GraphDFS::to_pos(int x, int y) {
-    // Converts the two-dimensional index pair (x,y) into a
-    // single-dimensional index. The result is y * ROW_WIDTH + x.
-    return y * getCols() + x;
-}
 
 int GraphDFS::is_in_bounds(int x, int y) {
     // Returns "true" if x and y are both in-bounds.
-    if (x < 0 || x >= getCols()) return false;
-    if (y < 0 || y >= getRows()) return false;
+    if (x < 0 || x + 1 >= getCols()) return false;
+    if (y < 0 || y + 1 >= getRows()) return false;
     return true;
 }
 
@@ -95,7 +138,6 @@ int GraphDFS::is_in_bounds(int pos) {
 void GraphDFS::dfs(int x, int y) {
     grid[to_pos(x, y)] = ' ';
     paths.insert(to_pos(x, y));
-
     int dirs[4] = {NORTH, EAST, SOUTH, WEST};
     for (int &dir: dirs) {
         int r = rand() & 3;
@@ -133,12 +175,13 @@ void GraphDFS::dfs(int x, int y) {
 }
 
 void GraphDFS::print() {
-    for (int y = getRows() - 1; y >= 0 ; y--) {
+    for (int y = getRows() - 1; y >= 0; y--) {
         for (int x = 0; x < getCols(); ++x) {
             cout << grid[to_pos(x, y)];
         }
         cout << endl;
     }
+    cout << "\n";
 }
 
 
@@ -150,13 +193,10 @@ bool GraphDFS::contains(std::set<int> set1, int el) {
 void GraphDFS::add_extra_paths() {
     int sqrt_tiles = (int) sqrt(getNumTiles());
     int limit = 0;
-    switch (sqrt_tiles) {
-        case 3:
-        case 5:
-            limit = 0;
-            break;
-        default:
-            limit = sqrt_tiles > 8 ? (int) 7 * sqrt_tiles / 8 - 3 : 2;
+    if (sqrt_tiles < 7) {
+        limit = 0;
+    } else {
+        limit = sqrt_tiles > 8 ? (int) 7 * sqrt_tiles / 8 - 3 : 2;
     }
     for (int i = 0; i < limit; i++) {
         int random_tile = rand() % getNumTiles();
@@ -170,9 +210,7 @@ void GraphDFS::add_extra_paths() {
 
 bool GraphDFS::check_can_be_path(int tile) {
     pair<int, int> *coords = toCoordinates(tile);
-    if (coords->first == 0 || coords->first == this->getCols() - 1)
-        return false;
-    if (coords->second == 0 || coords->second == this->getRows() - 1)
+    if (are_coords_on_frame_walls(coords))
         return false;
     int right = to_pos(coords->first + 1, coords->second);
     int left = to_pos(coords->first - 1, coords->second);
@@ -183,6 +221,24 @@ bool GraphDFS::check_can_be_path(int tile) {
     bool result = contains(paths, right) && contains(paths, left) && !contains(paths, up) && !contains(paths, down);
     result =
             result || !contains(paths, right) && !contains(paths, left) && contains(paths, up) && contains(paths, down);
+    return result;
+}
+
+bool GraphDFS::are_coords_on_frame_walls(const pair<int, int> *coords) {
+    bool on_frame_x = coords->first == 0 || coords->first == getCols() - 1;
+    bool on_frame_y = coords->second == 0 || coords->second == this->getRows() - 1;
+    return on_frame_x || on_frame_y;
+}
+
+bool GraphDFS::check_can_be_path_near_xframe_walls(int tile) {
+    pair<int, int> *coords = toCoordinates(tile);
+    if (are_coords_on_frame_walls(coords))
+        return false;
+    int right = to_pos(coords->first + 1, coords->second);
+    int left = to_pos(coords->first - 1, coords->second);
+    int down = to_pos(coords->first, coords->second + 1);
+    int up = to_pos(coords->first, coords->second - 1);
+    bool result = (contains(paths, right) || contains(paths, left)) && !contains(paths, up) && !contains(paths, down);
     return result;
 }
 

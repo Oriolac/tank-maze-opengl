@@ -103,12 +103,12 @@ void maze_display() {
     int i, j;
     glClearColor(BACKGROUND_COLOR);
     glClear(GL_COLOR_BUFFER_BIT);
-    for (int tile_count = 0; tile_count < COLUMNS * ROWS; tile_count++) {
-        if (graph->isWall(tile_count)) {
-            pair<int, int> *coords = graph->toCoordinates(tile_count);
-            i = coords->first;
-            j = coords->second;
-            addSquare(i, j, COLOR_WALL);
+    for (int row = ROWS - 1; row >= 0; row--) {
+        for (int col = COLUMNS - 1; col >= 0; col--) {
+            int pos = graph->to_pos(col, row);
+            if (graph->is_wall(pos)) {
+                addSquare(col, row, COLOR_WALL);
+            }
         }
     }
     pair<int, int> initial_pos = graph->get_main_coords();
@@ -118,6 +118,8 @@ void maze_display() {
 }
 
 void addSquare(int i, int j, struct Color color) {
+    i = i;
+    j = -j + ROWS - 1;
     glColor3f(color.red, color.green, color.blue);
     glBegin(GL_QUADS);
     glVertex2i(i * WIDTH / COLUMNS, j * HEIGHT / ROWS);
