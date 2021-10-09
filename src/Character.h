@@ -7,6 +7,15 @@
 
 #ifndef TANK_MAZE_CHARACTER_H
 #define TANK_MAZE_CHARACTER_H
+
+
+#define COLOR_ARG_FACE float redF, float greenF, float blueF
+#define COLOR_ARG_BACK float redB, float greenB, float blueB
+#define COLOR_PARAM_FACE redF, greenF, blueF
+#define COLOR_PARAM_BACK redB, greenB, blueB
+#define HEIGHT_TANK 10.0
+
+
 enum class Direction {
     UP, DOWN, LEFT, RIGHT, QUIET
 };
@@ -94,13 +103,44 @@ public:
     pair<int, int> getCoords();
 
     [[nodiscard]] virtual int time_remain() const = 0;
+
+    void draw(COLOR_ARG_FACE, COLOR_ARG_BACK) {
+        update_state();
+        glBegin(GL_TRIANGLES);
+        glColor3f(COLOR_PARAM_FACE);
+        glVertex3i(x_middle, y_start, HEIGHT_TANK);
+        glColor3f(COLOR_PARAM_BACK);
+        glVertex3i(x_finish, y_finish, HEIGHT_TANK);
+        glVertex3i(x_start, y_finish, HEIGHT_TANK);
+        glEnd();
+
+        glBegin(GL_QUADS);
+        glVertex3i(x_middle, y_start, HEIGHT_TANK);
+        glVertex3i(x_middle, y_start, 0);
+        glVertex3i(x_finish, y_finish, 0);
+        glVertex3i(x_finish, y_finish, HEIGHT_TANK);
+        glEnd();
+
+        glBegin(GL_QUADS);
+        glVertex3i(x_middle, y_start, 0);
+        glVertex3i(x_middle, y_start, HEIGHT_TANK);
+        glVertex3i(x_start, y_finish, HEIGHT_TANK);
+        glVertex3i(x_start, y_finish, 0);
+        glEnd();
+
+        glBegin(GL_QUADS);
+        glVertex3i(x_start, y_finish, 0);
+        glVertex3i(x_start, y_finish, HEIGHT_TANK);
+        glVertex3i(x_finish, y_finish, HEIGHT_TANK);
+        glVertex3i(x_finish, y_finish, 0);
+        glEnd();
+    }
+
 };
 
 class MainCharacter : public Character {
 public:
     MainCharacter(pair<int, int> coords, int tile_side_length);
-
-    void draw();
 
     [[nodiscard]] int time_remain() const override {
         return TIME_REMAINING_MAIN;
@@ -110,8 +150,6 @@ public:
 class EnemyCharacter : public Character {
 public:
     EnemyCharacter(pair<int, int> coords, int tile_side_length);
-
-    void draw();
 
     [[nodiscard]] int time_remain() const override {
         return TIME_REMAINING_ENEMY;
