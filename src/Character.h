@@ -17,7 +17,11 @@
 
 
 enum class Direction {
-    UP, DOWN, LEFT, RIGHT, QUIET
+    FORWARD, TURN_LEFT, TURN_RIGHT, STOPPED
+};
+
+enum class Orientation {
+    UP, DOWN, LEFT, RIGHT
 };
 
 class Character {
@@ -33,6 +37,7 @@ protected:
     double x_finish;
     double x_middle;
     Direction direction;
+    Orientation orientation;
     int time_remaining_movement;
 public:
     Character(pair<int, int> coords, int tile_side_length) {
@@ -43,7 +48,8 @@ public:
         this->tile_side_length = tile_side_length;
         variance = tile_side_length / 5;
         update_state();
-        direction = Direction::QUIET;
+        direction = Direction::FORWARD;
+        orientation = Orientation::DOWN;
         time_remaining_movement = 0;
         vX = 0;
         vY = 0;
@@ -58,25 +64,24 @@ public:
     };
 
     void move(Direction new_direction) {
-        if (direction == Direction::QUIET) {
-            direction = new_direction;
-            switch (new_direction) {
-                case Direction::UP:
+        if (new_direction == Direction::FORWARD && direction != Direction::FORWARD) {
+            switch (orientation) {
+                case Orientation::UP:
                     this->vX = 0;
                     this->vY = (double) tile_side_length / time_remain();
                     this->yTile = yTile + 1;
                     break;
-                case Direction::DOWN:
+                case Orientation::DOWN:
                     this->vX = 0;
-                    this->vY = - (double) tile_side_length / time_remain();
+                    this->vY = -(double) tile_side_length / time_remain();
                     this->yTile = yTile - 1;
                     break;
-                case Direction::LEFT:
-                    this->vX = - (double)tile_side_length / time_remain();
+                case Orientation::LEFT:
+                    this->vX = -(double) tile_side_length / time_remain();
                     this->vY = 0;
                     this->xTile = xTile - 1;
                     break;
-                case Direction::RIGHT:
+                case Orientation::RIGHT:
                     this->vX = (double) tile_side_length / time_remain();
                     this->vY = 0;
                     this->xTile = xTile + 1;
@@ -85,19 +90,23 @@ public:
                     break;
             }
             time_remaining_movement = time_remain();
+            printf("time: %i\n", time_remaining_movement);
+            direction = new_direction;
         }
     };
 
-    void integrate(int t) {
-        if (direction != Direction::QUIET && t < this->time_remaining_movement) {
+    bool integrate(int t) {
+        if (direction == Direction::FORWARD && t < this->time_remaining_movement) {
             this->x = x + vX * t;
             this->y = y + vY * t;
             this->time_remaining_movement -= t;
-        } else if (direction != Direction::QUIET && t >= this->time_remaining_movement) {
+        } else if (direction == Direction::FORWARD && t >= this->time_remaining_movement) {
             this->x = x + vX * this->time_remaining_movement;
             this->y = y + vY * this->time_remaining_movement;
-            this->direction = Direction::QUIET;
+            direction = Direction::STOPPED;
+            return true;
         }
+        return false;
     }
 
     pair<int, int> getCoords();
@@ -108,34 +117,37 @@ public:
         update_state();
         glBegin(GL_TRIANGLES);
         glColor3f(COLOR_PARAM_FACE);
-        glVertex3i(x_middle, y_start, HEIGHT_TANK);
+        glVertex3d(x_middle, y_start, HEIGHT_TANK);
         glColor3f(COLOR_PARAM_BACK);
-        glVertex3i(x_finish, y_finish, HEIGHT_TANK);
-        glVertex3i(x_start, y_finish, HEIGHT_TANK);
+        glVertex3d(x_finish, y_finish, HEIGHT_TANK);
+        glVertex3d(x_start, y_finish, HEIGHT_TANK);
         glEnd();
 
         glBegin(GL_QUADS);
-        glVertex3i(x_middle, y_start, HEIGHT_TANK);
-        glVertex3i(x_middle, y_start, 0);
-        glVertex3i(x_finish, y_finish, 0);
-        glVertex3i(x_finish, y_finish, HEIGHT_TANK);
+        glVertex3d(x_middle, y_start, HEIGHT_TANK);
+        glVertex3d(x_middle, y_start, 0);
+        glVertex3d(x_finish, y_finish, 0);
+        glVertex3d(x_finish, y_finish, HEIGHT_TANK);
         glEnd();
 
         glBegin(GL_QUADS);
-        glVertex3i(x_middle, y_start, 0);
-        glVertex3i(x_middle, y_start, HEIGHT_TANK);
-        glVertex3i(x_start, y_finish, HEIGHT_TANK);
-        glVertex3i(x_start, y_finish, 0);
+        glVertex3d(x_middle, y_start, 0);
+        glVertex3d(x_middle, y_start, HEIGHT_TANK);
+        glVertex3d(x_start, y_finish, HEIGHT_TANK);
+        glVertex3d(x_start, y_finish, 0);
         glEnd();
 
         glBegin(GL_QUADS);
-        glVertex3i(x_start, y_finish, 0);
-        glVertex3i(x_start, y_finish, HEIGHT_TANK);
-        glVertex3i(x_finish, y_finish, HEIGHT_TANK);
-        glVertex3i(x_finish, y_finish, 0);
+        glVertex3d(x_start, y_finish, 0);
+        glVertex3d(x_start, y_finish, HEIGHT_TANK);
+        glVertex3d(x_finish, y_finish, HEIGHT_TANK);
+        glVertex3d(x_finish, y_finish, 0);
         glEnd();
     }
 
+    Orientation getOrientation();
+
+    Direction getDirection();
 };
 
 class MainCharacter : public Character {

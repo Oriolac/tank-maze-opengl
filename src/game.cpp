@@ -55,8 +55,7 @@ int main(int argc, char **argv) {
     anglealpha = 90;
     anglebeta = -45;
     Dimensions dimensions = getDimensions(argc, argv);
-    bool mustPrint = false;
-    mustPrint = get_opt_args(argc, argv, dimensions);
+    bool mustPrint = get_opt_args(argc, argv, dimensions);
     graph->start();
     if (mustPrint)
         graph->print();
@@ -64,6 +63,8 @@ int main(int argc, char **argv) {
     EnemyCharacter enemy_character = EnemyCharacter(graph->get_enemy_coords(), SIDE_LENGTH);
     Context new_cont = Context(graph, &main_character, &enemy_character);
     context = &new_cont;
+    context->move_main(Direction::FORWARD);
+    context->move_enemy(Direction::FORWARD);
     config_opengl(argc, argv);
 }
 
@@ -198,19 +199,11 @@ void keyboard(unsigned char c, int x, int y) {
     switch (c) {
         case 'a':
         case 'A':
-            context->move(Direction::LEFT);
+            context->move_main(Direction::TURN_LEFT);
             break;
         case 'd':
         case 'D':
-            context->move(Direction::RIGHT);
-            break;
-        case 'w':
-        case 'W':
-            context->move(Direction::UP);
-            break;
-        case 's':
-        case 'S':
-            context->move(Direction::DOWN);
+            context->move_main(Direction::TURN_RIGHT);
             break;
         case 'i':
             if (anglebeta <= (90 - 4))
@@ -237,11 +230,11 @@ void idle() {
     if (last_t == 0) {
         last_t = t;
     } else {
-        context->getMainCharacter()->integrate(t - last_t);
-        context->getEnemyCharacter()->integrate(t - last_t);
+        context->integrate(context->getMainCharacter(), t - last_t);
+        context->integrate(context->getEnemyCharacter(), t - last_t);
         last_t = t;
     }
-    Direction dir = static_cast<Direction>(rand() % 5);
+    Direction dir = static_cast<Direction>(rand() % 3);
     context->move_enemy(dir);
     glutPostRedisplay();
 }

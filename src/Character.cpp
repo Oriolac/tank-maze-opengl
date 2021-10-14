@@ -10,10 +10,19 @@ std::pair<int, int> Character:: getCoords() {
     return {this->xTile, this->yTile};
 }
 
+Orientation Character::getOrientation() {
+    return this->orientation;
+}
+
+Direction Character::getDirection() {
+    return this->direction;
+}
+
 MainCharacter::MainCharacter(std::pair<int, int> coords, int tile_side_length) : Character(coords, tile_side_length) {
     draw(COLORTUP_MAIN_FACE_VERTEX, COLORTUP_MAIN_BACK_VERTEX);
 }
 
 EnemyCharacter::EnemyCharacter(pair<int, int> coords, int tile_side_length) : Character(coords, tile_side_length) {
     draw(COLORTUP_ENEMY_FACE_VERTEX, COLORTUP_MAIN_BACK_VERTEX);
+    orientation = Orientation::UP;
 }
