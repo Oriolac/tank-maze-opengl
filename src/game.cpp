@@ -24,6 +24,7 @@ int WIDTH;
 int HEIGHT;
 int anglebeta = 0;
 int anglealpha = 0;
+double time_left = 60;
 
 int last_t = 0;
 
@@ -32,6 +33,8 @@ void display();
 void config_opengl(int &argc, char **argv);
 
 void addSquare(int i, int j, struct Color color, int height);
+
+void screen_display();
 
 void maze_display();
 
@@ -122,6 +125,7 @@ void config_opengl(int &argc, char **argv) {
 
 
 void display() {
+    screen_display();
     maze_display();
     characters_display();
     glutSwapBuffers();
@@ -132,6 +136,9 @@ void characters_display() {
     context->getEnemyCharacter()->draw(COLORTUP_ENEMY_FACE_VERTEX, COLORTUP_ENEMY_BACK_VERTEX);
 }
 
+void screen_display() {
+    printf("TIME_LEFT = %i\n", (int) time_left);
+}
 
 void maze_display() {
     int i, j;
@@ -161,14 +168,10 @@ void maze_display() {
 }
 
 void create_position_observer(int alpha, int beta, int radi) {
-    float x, y, z;
     float upx, upy, upz;
-    float modul;
-
-    x = (float) radi * cos(alpha * 2 * PI / 360.0) * cos(beta * 2 * PI / 360.0);
-    y = (float) radi * sin(beta * 2 * PI / 360.0);
-    z = (float) radi * sin(alpha * 2 * PI / 360.0) * cos(beta * 2 * PI / 360.0);
-
+    float x = (float) radi * cos(alpha * 2 * PI / 360.0) * cos(beta * 2 * PI / 360.0);
+    float y = (float) radi * sin(beta * 2 * PI / 360.0);
+    float z = (float) radi * sin(alpha * 2 * PI / 360.0) * cos(beta * 2 * PI / 360.0);
     if (beta > 0) {
         upx = -x;
         upz = -z;
@@ -182,14 +185,10 @@ void create_position_observer(int alpha, int beta, int radi) {
         upz = z;
         upy = -(x * x + z * z) / y;
     }
-
-
-    modul = sqrt(upx * upx + upy * upy + upz * upz);
-
+    float modul = sqrt(upx * upx + upy * upy + upz * upz);
     upx = upx / modul;
     upy = upy / modul;
     upz = upz / modul;
-
     gluLookAt(x, y, z, WIDTH / 2, HEIGHT / 2, 0.0, upx, upy, upz);
 }
 
@@ -225,6 +224,7 @@ void keyboard(unsigned char c, int x, int y) {
 
 void idle() {
     int t = glutGet(GLUT_ELAPSED_TIME);
+    time_left = time_left - (((double) t) / (100000));
     if (last_t == 0) {
         last_t = t;
     } else {
