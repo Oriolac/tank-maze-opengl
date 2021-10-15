@@ -24,7 +24,8 @@ int WIDTH;
 int HEIGHT;
 int anglebeta = 0;
 int anglealpha = 0;
-double time_left = 60;
+double time_maze = 60;
+double time_left = time_maze;
 
 int last_t = 0;
 
@@ -125,9 +126,10 @@ void config_opengl(int &argc, char **argv) {
 
 
 void display() {
-    screen_display();
+    glClearColor(BACKGROUND_COLOR);
     maze_display();
     characters_display();
+    screen_display();
     glutSwapBuffers();
 }
 
@@ -137,12 +139,36 @@ void characters_display() {
 }
 
 void screen_display() {
-    printf("TIME_LEFT = %i\n", (int) time_left);
+    float scale = 0.4;
+    glColor3f(0.0, 0.0, 0.0);
+    glMatrixMode(GL_PROJECTION);
+    glPushMatrix();
+    glLoadIdentity();
+    gluOrtho2D(0.0, WIDTH, 0.0, HEIGHT);
+    glMatrixMode(GL_MODELVIEW);
+    glPushMatrix();
+    glLoadIdentity();
+    glTranslatef(0, HEIGHT * 9/10, 1);
+    glScalef(scale, scale, 1);
+    string s = "Time left:";
+    s = s.append(std::to_string((int) time_left));
+    void *font = GLUT_STROKE_MONO_ROMAN;
+    int x = 0;
+    for (char c: s) {
+        glPushMatrix();
+        glTranslatef(x * 90, 0, 0);
+        glutStrokeCharacter(font, c);
+        glPopMatrix();
+        x++;
+    }
+    glMatrixMode(GL_PROJECTION);
+    glPopMatrix();
+    glMatrixMode(GL_MODELVIEW);
+    glPopMatrix();
 }
 
 void maze_display() {
     int i, j;
-    glClearColor(BACKGROUND_COLOR);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
@@ -150,7 +176,7 @@ void maze_display() {
 
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    glOrtho(-WIDTH * 2 / 3, WIDTH * 2 / 3, -HEIGHT * 2 / 3, HEIGHT * 2 / 3, 10, 2000);
+    glOrtho(-WIDTH * 2 / 3, WIDTH * 2 / 3, -HEIGHT * 2 / 3, HEIGHT * 2 / 3, -10000, 20000);
     for (int tile_count = 0; tile_count < COLUMNS * ROWS; tile_count++) {
         pair<int, int> *coords = graph->toCoordinates(tile_count);
         i = coords->first;
@@ -224,7 +250,7 @@ void keyboard(unsigned char c, int x, int y) {
 
 void idle() {
     int t = glutGet(GLUT_ELAPSED_TIME);
-    time_left = time_left - (((double) t) / (100000));
+    time_left = time_maze - (((double) t) / (1000));
     if (last_t == 0) {
         last_t = t;
     } else {
@@ -249,44 +275,44 @@ void addSquare(int i, int j, struct Color color, int height) {
 
     glColor3f(0, 0, 0);
     glBegin(GL_QUADS);
-    glVertex3f(i * WIDTH / COLUMNS , j * HEIGHT / ROWS , FLOOR);
-    glVertex3f(i * WIDTH / COLUMNS , (j + 1) * HEIGHT / ROWS , FLOOR);
-    glVertex3f((i + 1) * WIDTH / COLUMNS, (j + 1) * HEIGHT / ROWS , FLOOR);
-    glVertex3f((i + 1) * WIDTH / COLUMNS, j * HEIGHT / ROWS , FLOOR);
+    glVertex3f(i * WIDTH / COLUMNS, j * HEIGHT / ROWS, FLOOR);
+    glVertex3f(i * WIDTH / COLUMNS, (j + 1) * HEIGHT / ROWS, FLOOR);
+    glVertex3f((i + 1) * WIDTH / COLUMNS, (j + 1) * HEIGHT / ROWS, FLOOR);
+    glVertex3f((i + 1) * WIDTH / COLUMNS, j * HEIGHT / ROWS, FLOOR);
     glEnd();
 
     glColor3f(COLORTUP_WALL_SIDE);
     glBegin(GL_QUADS);
-    glVertex3f(i * WIDTH / COLUMNS , ((j + 1) * HEIGHT / ROWS) , height);
-    glVertex3f((i + 1) * WIDTH / COLUMNS , (j + 1) * HEIGHT / ROWS, height);
-    glVertex3f((i + 1) * WIDTH / COLUMNS , (j + 1) * HEIGHT / ROWS, FLOOR );
-    glVertex3f(i * WIDTH / COLUMNS, (j + 1) * HEIGHT / ROWS , FLOOR );
+    glVertex3f(i * WIDTH / COLUMNS, ((j + 1) * HEIGHT / ROWS), height);
+    glVertex3f((i + 1) * WIDTH / COLUMNS, (j + 1) * HEIGHT / ROWS, height);
+    glVertex3f((i + 1) * WIDTH / COLUMNS, (j + 1) * HEIGHT / ROWS, FLOOR);
+    glVertex3f(i * WIDTH / COLUMNS, (j + 1) * HEIGHT / ROWS, FLOOR);
     glEnd();
 
     glColor3f(COLORTUP_WALL_SIDE);
     glBegin(GL_QUADS);
     glVertex3f(i * WIDTH / COLUMNS, j * HEIGHT / ROWS, FLOOR);
-    glVertex3f((i + 1) * WIDTH / COLUMNS, j * HEIGHT / ROWS, FLOOR );
+    glVertex3f((i + 1) * WIDTH / COLUMNS, j * HEIGHT / ROWS, FLOOR);
     glVertex3f((i + 1) * WIDTH / COLUMNS, j * HEIGHT / ROWS, height);
-    glVertex3f(i * WIDTH / COLUMNS, j * HEIGHT / ROWS, height );
+    glVertex3f(i * WIDTH / COLUMNS, j * HEIGHT / ROWS, height);
     glEnd();
 
 
     glColor3f(COLORTUP_WALL_SIDE);
     glBegin(GL_QUADS);
-    glVertex3f(i * WIDTH / COLUMNS , j * HEIGHT / ROWS , height);
-    glVertex3f(i * WIDTH / COLUMNS , (j + 1) * HEIGHT / ROWS , height);
-    glVertex3f(i * WIDTH / COLUMNS , (j + 1) * HEIGHT / ROWS , FLOOR );
-    glVertex3f(i * WIDTH / COLUMNS , j * HEIGHT / ROWS , FLOOR );
+    glVertex3f(i * WIDTH / COLUMNS, j * HEIGHT / ROWS, height);
+    glVertex3f(i * WIDTH / COLUMNS, (j + 1) * HEIGHT / ROWS, height);
+    glVertex3f(i * WIDTH / COLUMNS, (j + 1) * HEIGHT / ROWS, FLOOR);
+    glVertex3f(i * WIDTH / COLUMNS, j * HEIGHT / ROWS, FLOOR);
     glEnd();
 
 
     glColor3f(COLORTUP_WALL_SIDE);
     glBegin(GL_QUADS);
-    glVertex3f((i + 1) * WIDTH / COLUMNS , j * HEIGHT / ROWS , height );
-    glVertex3f((i + 1) * WIDTH / COLUMNS , j * HEIGHT / ROWS , FLOOR );
-    glVertex3f((i + 1) * WIDTH / COLUMNS , (j + 1) * HEIGHT / ROWS , FLOOR );
-    glVertex3f((i + 1) * WIDTH / COLUMNS , (j + 1) * HEIGHT / ROWS , height);
+    glVertex3f((i + 1) * WIDTH / COLUMNS, j * HEIGHT / ROWS, height);
+    glVertex3f((i + 1) * WIDTH / COLUMNS, j * HEIGHT / ROWS, FLOOR);
+    glVertex3f((i + 1) * WIDTH / COLUMNS, (j + 1) * HEIGHT / ROWS, FLOOR);
+    glVertex3f((i + 1) * WIDTH / COLUMNS, (j + 1) * HEIGHT / ROWS, height);
     glEnd();
 
 }
@@ -297,7 +323,7 @@ void addPath(int i, int j, Color color, float height) {
     glColor3f(color.red, color.green, color.blue);
     glBegin(GL_QUADS);
 
-    glVertex3f(i * WIDTH / COLUMNS, j * HEIGHT / ROWS,  height);
+    glVertex3f(i * WIDTH / COLUMNS, j * HEIGHT / ROWS, height);
     glVertex3f((i + 1) * WIDTH / COLUMNS, j * HEIGHT / ROWS, height);
     glVertex3f((i + 1) * WIDTH / COLUMNS, (j + 1) * HEIGHT / ROWS, height);
     glVertex3f(i * WIDTH / COLUMNS, (j + 1) * HEIGHT / ROWS, height);
