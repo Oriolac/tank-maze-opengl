@@ -8,24 +8,31 @@
 #include "Character.h"
 
 void Context::move_main(Direction direction) {
-    main_character->move(direction);
+    if (direction == Direction::FORWARD && main_character->getDirection() == Direction::STOPPED)
+        return;
+    if (direction != Direction::FORWARD || check_can_go_forward(getMainCharacter()))
+        main_character->move(direction);
 }
 
 void Context::move_enemy(Direction direction) {
-    enemy_character->move(direction);
+    if (direction == Direction::FORWARD && enemy_character->getDirection() == Direction::STOPPED)
+        return;
+    if (direction != Direction::FORWARD || check_can_go_forward(getEnemyCharacter()))
+        enemy_character->move(direction);
 }
 
-bool Context::check_can_move_if_forward(const pair<int, int> &coords, Character *pCharacter) {
+bool
+Context::check_can_move_if_forward(const pair<int, int> &coords, Character *pCharacter, Character *otherCharacter) {
     int x, y;
     bool can_move = true;
     switch (pCharacter->getOrientation()) {
         case Orientation::DOWN:
             x = coords.first;
-            y = coords.second + 1;
+            y = coords.second - 1;
             break;
         case Orientation::UP:
             x = coords.first;
-            y = coords.second - 1;
+            y = coords.second + 1;
             break;
         case Orientation::LEFT:
             x = coords.first - 1;
@@ -40,32 +47,33 @@ bool Context::check_can_move_if_forward(const pair<int, int> &coords, Character 
             break;
     }
     can_move = can_move && !graph->is_wall(x, y);
-    printf("%i %i to %i %i ISWALL??%i\n", coords.first, coords.second, x, y, graph->is_wall(x, y));
-    pair<int, int> other_coords = pCharacter->getCoords();
+    pair<int, int> other_coords = otherCharacter->getCoords();
     can_move = can_move && !(x == other_coords.first && y == other_coords.second);
     return can_move;
 }
 
 void Context::integrate(Character *pCharacter, int i) {
-    if (pCharacter->getDirection() == Direction::FORWARD) {
+    if (pCharacter->getDirection() != Direction::STOPPED) {
         bool hasFinished = pCharacter->integrate(i);
         if (hasFinished) {
-            bool is_instance = dynamic_cast<MainCharacter*>(pCharacter) != nullptr;
-            is_instance = is_instance && check_can_move_if_forward(pCharacter->getCoords(), getEnemyCharacter());
-            is_instance = is_instance || dynamic_cast<EnemyCharacter*>(pCharacter) != nullptr &&
-                                         check_can_move_if_forward(pCharacter->getCoords(), getMainCharacter());
-            printf("%i HAS FINISHED: %i\n", dynamic_cast<MainCharacter*>(pCharacter) != nullptr, is_instance);
-            if (is_instance) {
-                printf("CAN MOVE FORWARD\n");
+            if (pCharacter->hasNextDirection() && pCharacter->nextDirection() != Direction::FORWARD) {
+                pCharacter->nextMoveNotForward();
+            } else if (check_can_go_forward(pCharacter)) {
                 pCharacter->move(Direction::FORWARD);
-            } else {
-                printf("CANNOT MOVE FORWARD %i\n", dynamic_cast<MainCharacter*>(pCharacter) != nullptr);
             }
         }
     } else {
-        bool hasFinished = pCharacter->integrate(i);
+        pCharacter->integrate(i);
     }
 
 
+}
+
+bool Context::check_can_go_forward(Character *pCharacter) {
+    bool res = pCharacter->isMainCharacter() &&
+               check_can_move_if_forward(pCharacter->getCoords(), getMainCharacter(), getEnemyCharacter());
+    res = res || !pCharacter->isMainCharacter() &&
+                 check_can_move_if_forward(pCharacter->getCoords(), getEnemyCharacter(), getMainCharacter());
+    return res;
 }
 

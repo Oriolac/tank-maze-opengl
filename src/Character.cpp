@@ -18,6 +18,20 @@ Direction Character::getDirection() {
     return this->direction;
 }
 
+bool MainCharacter::isMainCharacter() {
+    return true;
+}
+
+void Character::nextMoveNotForward() {
+    Direction new_direction = next_direction == Direction::FORWARD ? Direction::STOPPED : next_direction;
+    this->next_direction = Direction::STOPPED;
+    move(new_direction);
+}
+
+Direction Character::nextDirection() {
+    return this->next_direction;
+}
+
 MainCharacter::MainCharacter(std::pair<int, int> coords, int tile_side_length) : Character(coords, tile_side_length) {
     draw(COLORTUP_MAIN_FACE_VERTEX, COLORTUP_MAIN_BACK_VERTEX);
 }
@@ -25,4 +39,8 @@ MainCharacter::MainCharacter(std::pair<int, int> coords, int tile_side_length) :
 EnemyCharacter::EnemyCharacter(pair<int, int> coords, int tile_side_length) : Character(coords, tile_side_length) {
     draw(COLORTUP_ENEMY_FACE_VERTEX, COLORTUP_MAIN_BACK_VERTEX);
     orientation = Orientation::UP;
+}
+
+bool EnemyCharacter::isMainCharacter() {
+    return false;
 }

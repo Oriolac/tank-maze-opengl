@@ -1,6 +1,6 @@
 
 all: compile
-	./comp/game 10 10 --print --func=dfs
+	./comp/game 15 15 --print --func=dfs
 
 compile: src/game.cpp
 	gcc ./src/game.cpp -o ./comp/game -lglut -lGLU -lGL -lm -lstdc++

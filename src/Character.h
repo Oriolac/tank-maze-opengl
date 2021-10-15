@@ -1,7 +1,6 @@
 //
 // Created by oriol on 10/6/21.
 //
-
 #define TIME_REMAINING_MAIN 200
 #define TIME_REMAINING_ENEMY 200
 
@@ -20,9 +19,39 @@ enum class Direction {
     FORWARD, TURN_LEFT, TURN_RIGHT, STOPPED
 };
 
+inline const char *ToString(Direction v) {
+    switch (v) {
+        case Direction::FORWARD:
+            return "FORWARD";
+        case Direction::TURN_LEFT:
+            return "TURN_LEFT";
+        case Direction::TURN_RIGHT:
+            return "TURN_RIGHT";
+        case Direction::STOPPED:
+            return "STOPPED";
+        default:
+            return "[Unknown OS_type]";
+    }
+}
+
 enum class Orientation {
-    UP, DOWN, LEFT, RIGHT
+    UP, LEFT, DOWN, RIGHT
 };
+
+inline const char *ToString(Orientation v) {
+    switch (v) {
+        case Orientation::UP:
+            return "UP";
+        case Orientation::DOWN:
+            return "DOWN";
+        case Orientation::LEFT:
+            return "LEFT";
+        case Orientation::RIGHT:
+            return "RIGHT";
+        default:
+            return "[Unknown OS_type]";
+    }
+}
 
 class Character {
 protected:
@@ -39,6 +68,7 @@ protected:
     Direction direction;
     Orientation orientation;
     int time_remaining_movement;
+    Direction next_direction;
 public:
     Character(pair<int, int> coords, int tile_side_length) {
         xTile = coords.first;
@@ -50,6 +80,7 @@ public:
         update_state();
         direction = Direction::FORWARD;
         orientation = Orientation::DOWN;
+        next_direction = Direction::STOPPED;
         time_remaining_movement = 0;
         vX = 0;
         vY = 0;
@@ -64,34 +95,50 @@ public:
     };
 
     void move(Direction new_direction) {
-        if (new_direction == Direction::FORWARD && direction != Direction::FORWARD) {
-            switch (orientation) {
-                case Orientation::UP:
-                    this->vX = 0;
-                    this->vY = (double) tile_side_length / time_remain();
-                    this->yTile = yTile + 1;
-                    break;
-                case Orientation::DOWN:
-                    this->vX = 0;
-                    this->vY = -(double) tile_side_length / time_remain();
-                    this->yTile = yTile - 1;
-                    break;
-                case Orientation::LEFT:
-                    this->vX = -(double) tile_side_length / time_remain();
-                    this->vY = 0;
-                    this->xTile = xTile - 1;
-                    break;
-                case Orientation::RIGHT:
-                    this->vX = (double) tile_side_length / time_remain();
-                    this->vY = 0;
-                    this->xTile = xTile + 1;
-                    break;
-                default:
-                    break;
-            }
+        next_direction = new_direction;
+        if (direction == Direction::STOPPED && (next_direction == Direction::TURN_RIGHT || next_direction == Direction::TURN_LEFT)) {
+            direction = next_direction;
+            orientation = apply_direction(direction, orientation);
+            next_direction = Direction::STOPPED;
+        } else if (next_direction == Direction::FORWARD && direction != Direction::FORWARD) {
+            calculate_velocity_and_next_tile();
             time_remaining_movement = time_remain();
-            printf("time: %i\n", time_remaining_movement);
             direction = new_direction;
+        }
+    }
+
+    Orientation apply_direction(Direction direction, Orientation curr_orientation) {
+        if (direction == Direction::TURN_RIGHT) {
+            return static_cast<Orientation>((static_cast<int>(curr_orientation) + 3) % 4);
+        } else {
+            return static_cast<Orientation>((static_cast<int>(curr_orientation) + 1) % 4);
+        }
+    }
+
+    void calculate_velocity_and_next_tile() {
+        switch (orientation) {
+            case Orientation::UP:
+                vX = 0;
+                vY = (double) tile_side_length / time_remain();
+                yTile = yTile + 1;
+                break;
+            case Orientation::DOWN:
+                vX = 0;
+                vY = -(double) tile_side_length / time_remain();
+                yTile = yTile - 1;
+                break;
+            case Orientation::LEFT:
+                vX = -(double) tile_side_length / time_remain();
+                vY = 0;
+                xTile = xTile - 1;
+                break;
+            case Orientation::RIGHT:
+                vX = (double) tile_side_length / time_remain();
+                vY = 0;
+                xTile = xTile + 1;
+                break;
+            default:
+                break;
         }
     };
 
@@ -103,6 +150,12 @@ public:
         } else if (direction == Direction::FORWARD && t >= this->time_remaining_movement) {
             this->x = x + vX * this->time_remaining_movement;
             this->y = y + vY * this->time_remaining_movement;
+            direction = Direction::STOPPED;
+            return true;
+        } else if (direction == Direction::TURN_RIGHT) {
+            direction = Direction::STOPPED;
+            return true;
+        } else if (direction == Direction::TURN_LEFT) {
             direction = Direction::STOPPED;
             return true;
         }
@@ -148,6 +201,16 @@ public:
     Orientation getOrientation();
 
     Direction getDirection();
+
+    void nextMoveNotForward();
+
+    virtual bool isMainCharacter() = 0;
+
+    bool hasNextDirection() {
+        return this->next_direction != Direction::STOPPED;
+    }
+
+    Direction nextDirection();
 };
 
 class MainCharacter : public Character {
@@ -157,6 +220,8 @@ public:
     [[nodiscard]] int time_remain() const override {
         return TIME_REMAINING_MAIN;
     }
+
+    bool isMainCharacter() override;
 };
 
 class EnemyCharacter : public Character {
@@ -167,7 +232,7 @@ public:
         return TIME_REMAINING_ENEMY;
     }
 
+    bool isMainCharacter() override;
 };
-
 
 #endif //TANK_MAZE_CHARACTER_H

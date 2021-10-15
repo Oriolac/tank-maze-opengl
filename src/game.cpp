@@ -10,7 +10,7 @@
 #include "maze_gen/backtraking.cpp"
 #include <memory>
 
-#define SIDE_LENGTH 30
+#define SIDE_LENGTH 40
 
 #define PI 3.1416
 #define BACKGROUND_COLOR 0.75, 0.75, 0.9, 0.0
@@ -53,7 +53,7 @@ int main(int argc, char **argv) {
         exit(0);
     }
     anglealpha = 90;
-    anglebeta = -45;
+    anglebeta = -2;
     Dimensions dimensions = getDimensions(argc, argv);
     bool mustPrint = get_opt_args(argc, argv, dimensions);
     graph->start();
@@ -63,8 +63,6 @@ int main(int argc, char **argv) {
     EnemyCharacter enemy_character = EnemyCharacter(graph->get_enemy_coords(), SIDE_LENGTH);
     Context new_cont = Context(graph, &main_character, &enemy_character);
     context = &new_cont;
-    context->move_main(Direction::FORWARD);
-    context->move_enemy(Direction::FORWARD);
     config_opengl(argc, argv);
 }
 
@@ -151,7 +149,7 @@ void maze_display() {
         i = coords->first;
         j = coords->second;
         if (graph->is_wall(tile_count)) {
-            addSquare(i, j, COLOR_WALL, 10);
+            addSquare(i, j, COLOR_WALL, 20);
         } else {
             addPath(i, j, COLOR_PATH, FLOOR);
         }
@@ -234,8 +232,7 @@ void idle() {
         context->integrate(context->getEnemyCharacter(), t - last_t);
         last_t = t;
     }
-    Direction dir = static_cast<Direction>(rand() % 3);
-    context->move_enemy(dir);
+    context->move_enemy(static_cast<Direction>(rand() % 3));
     glutPostRedisplay();
 }
 
