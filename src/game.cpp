@@ -139,7 +139,7 @@ void characters_display() {
 }
 
 void screen_display() {
-    float scale = 0.4;
+    float scale = 0.2;
     glColor3f(0.0, 0.0, 0.0);
     glMatrixMode(GL_PROJECTION);
     glPushMatrix();
@@ -148,7 +148,7 @@ void screen_display() {
     glMatrixMode(GL_MODELVIEW);
     glPushMatrix();
     glLoadIdentity();
-    glTranslatef(0, HEIGHT * 9/10, 1);
+    glTranslatef(WIDTH * 3/ 5, HEIGHT * 9/10, 1);
     glScalef(scale, scale, 1);
     string s = "Time left:";
     s = s.append(std::to_string((int) time_left));
