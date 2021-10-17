@@ -1,7 +1,6 @@
 //
 // Created by oriol on 10/6/21.
 //
-
 #define TIME_REMAINING_MAIN 200
 #define TIME_REMAINING_ENEMY 200
 
@@ -17,8 +16,42 @@
 
 
 enum class Direction {
-    UP, DOWN, LEFT, RIGHT, QUIET
+    FORWARD, TURN_LEFT, TURN_RIGHT, STOPPED
 };
+
+inline const char *ToString(Direction v) {
+    switch (v) {
+        case Direction::FORWARD:
+            return "FORWARD";
+        case Direction::TURN_LEFT:
+            return "TURN_LEFT";
+        case Direction::TURN_RIGHT:
+            return "TURN_RIGHT";
+        case Direction::STOPPED:
+            return "STOPPED";
+        default:
+            return "[Unknown OS_type]";
+    }
+}
+
+enum class Orientation {
+    UP, LEFT, DOWN, RIGHT
+};
+
+inline const char *ToString(Orientation v) {
+    switch (v) {
+        case Orientation::UP:
+            return "UP";
+        case Orientation::DOWN:
+            return "DOWN";
+        case Orientation::LEFT:
+            return "LEFT";
+        case Orientation::RIGHT:
+            return "RIGHT";
+        default:
+            return "[Unknown OS_type]";
+    }
+}
 
 class Character {
 protected:
@@ -33,7 +66,9 @@ protected:
     double x_finish;
     double x_middle;
     Direction direction;
+    Orientation orientation;
     int time_remaining_movement;
+    Direction next_direction;
 public:
     Character(pair<int, int> coords, int tile_side_length) {
         xTile = coords.first;
@@ -43,7 +78,9 @@ public:
         this->tile_side_length = tile_side_length;
         variance = tile_side_length / 5;
         update_state();
-        direction = Direction::QUIET;
+        direction = Direction::FORWARD;
+        orientation = Orientation::DOWN;
+        next_direction = Direction::STOPPED;
         time_remaining_movement = 0;
         vX = 0;
         vY = 0;
@@ -58,46 +95,71 @@ public:
     };
 
     void move(Direction new_direction) {
-        if (direction == Direction::QUIET) {
-            direction = new_direction;
-            switch (new_direction) {
-                case Direction::UP:
-                    this->vX = 0;
-                    this->vY = (double) tile_side_length / time_remain();
-                    this->yTile = yTile + 1;
-                    break;
-                case Direction::DOWN:
-                    this->vX = 0;
-                    this->vY = - (double) tile_side_length / time_remain();
-                    this->yTile = yTile - 1;
-                    break;
-                case Direction::LEFT:
-                    this->vX = - (double)tile_side_length / time_remain();
-                    this->vY = 0;
-                    this->xTile = xTile - 1;
-                    break;
-                case Direction::RIGHT:
-                    this->vX = (double) tile_side_length / time_remain();
-                    this->vY = 0;
-                    this->xTile = xTile + 1;
-                    break;
-                default:
-                    break;
-            }
+        next_direction = new_direction;
+        if (direction == Direction::STOPPED && (next_direction == Direction::TURN_RIGHT || next_direction == Direction::TURN_LEFT)) {
+            direction = next_direction;
+            orientation = apply_direction(direction, orientation);
+            next_direction = Direction::STOPPED;
+        } else if (next_direction == Direction::FORWARD && direction != Direction::FORWARD) {
+            calculate_velocity_and_next_tile();
             time_remaining_movement = time_remain();
+            direction = new_direction;
+        }
+    }
+
+    Orientation apply_direction(Direction direction, Orientation curr_orientation) {
+        if (direction == Direction::TURN_RIGHT) {
+            return static_cast<Orientation>((static_cast<int>(curr_orientation) + 3) % 4);
+        } else {
+            return static_cast<Orientation>((static_cast<int>(curr_orientation) + 1) % 4);
+        }
+    }
+
+    void calculate_velocity_and_next_tile() {
+        switch (orientation) {
+            case Orientation::UP:
+                vX = 0;
+                vY = (double) tile_side_length / time_remain();
+                yTile = yTile + 1;
+                break;
+            case Orientation::DOWN:
+                vX = 0;
+                vY = -(double) tile_side_length / time_remain();
+                yTile = yTile - 1;
+                break;
+            case Orientation::LEFT:
+                vX = -(double) tile_side_length / time_remain();
+                vY = 0;
+                xTile = xTile - 1;
+                break;
+            case Orientation::RIGHT:
+                vX = (double) tile_side_length / time_remain();
+                vY = 0;
+                xTile = xTile + 1;
+                break;
+            default:
+                break;
         }
     };
 
-    void integrate(int t) {
-        if (direction != Direction::QUIET && t < this->time_remaining_movement) {
+    bool integrate(int t) {
+        if (direction == Direction::FORWARD && t < this->time_remaining_movement) {
             this->x = x + vX * t;
             this->y = y + vY * t;
             this->time_remaining_movement -= t;
-        } else if (direction != Direction::QUIET && t >= this->time_remaining_movement) {
+        } else if (direction == Direction::FORWARD && t >= this->time_remaining_movement) {
             this->x = x + vX * this->time_remaining_movement;
             this->y = y + vY * this->time_remaining_movement;
-            this->direction = Direction::QUIET;
+            direction = Direction::STOPPED;
+            return true;
+        } else if (direction == Direction::TURN_RIGHT) {
+            direction = Direction::STOPPED;
+            return true;
+        } else if (direction == Direction::TURN_LEFT) {
+            direction = Direction::STOPPED;
+            return true;
         }
+        return false;
     }
 
     pair<int, int> getCoords();
@@ -108,34 +170,47 @@ public:
         update_state();
         glBegin(GL_TRIANGLES);
         glColor3f(COLOR_PARAM_FACE);
-        glVertex3i(x_middle, y_start, HEIGHT_TANK);
+        glVertex3d(x_middle, y_start, HEIGHT_TANK);
         glColor3f(COLOR_PARAM_BACK);
-        glVertex3i(x_finish, y_finish, HEIGHT_TANK);
-        glVertex3i(x_start, y_finish, HEIGHT_TANK);
+        glVertex3d(x_finish, y_finish, HEIGHT_TANK);
+        glVertex3d(x_start, y_finish, HEIGHT_TANK);
         glEnd();
 
         glBegin(GL_QUADS);
-        glVertex3i(x_middle, y_start, HEIGHT_TANK);
-        glVertex3i(x_middle, y_start, 0);
-        glVertex3i(x_finish, y_finish, 0);
-        glVertex3i(x_finish, y_finish, HEIGHT_TANK);
+        glVertex3d(x_middle, y_start, HEIGHT_TANK);
+        glVertex3d(x_middle, y_start, 0);
+        glVertex3d(x_finish, y_finish, 0);
+        glVertex3d(x_finish, y_finish, HEIGHT_TANK);
         glEnd();
 
         glBegin(GL_QUADS);
-        glVertex3i(x_middle, y_start, 0);
-        glVertex3i(x_middle, y_start, HEIGHT_TANK);
-        glVertex3i(x_start, y_finish, HEIGHT_TANK);
-        glVertex3i(x_start, y_finish, 0);
+        glVertex3d(x_middle, y_start, 0);
+        glVertex3d(x_middle, y_start, HEIGHT_TANK);
+        glVertex3d(x_start, y_finish, HEIGHT_TANK);
+        glVertex3d(x_start, y_finish, 0);
         glEnd();
 
         glBegin(GL_QUADS);
-        glVertex3i(x_start, y_finish, 0);
-        glVertex3i(x_start, y_finish, HEIGHT_TANK);
-        glVertex3i(x_finish, y_finish, HEIGHT_TANK);
-        glVertex3i(x_finish, y_finish, 0);
+        glVertex3d(x_start, y_finish, 0);
+        glVertex3d(x_start, y_finish, HEIGHT_TANK);
+        glVertex3d(x_finish, y_finish, HEIGHT_TANK);
+        glVertex3d(x_finish, y_finish, 0);
         glEnd();
     }
 
+    Orientation getOrientation();
+
+    Direction getDirection();
+
+    void nextMoveNotForward();
+
+    virtual bool isMainCharacter() = 0;
+
+    bool hasNextDirection() {
+        return this->next_direction != Direction::STOPPED;
+    }
+
+    Direction nextDirection();
 };
 
 class MainCharacter : public Character {
@@ -145,6 +220,8 @@ public:
     [[nodiscard]] int time_remain() const override {
         return TIME_REMAINING_MAIN;
     }
+
+    bool isMainCharacter() override;
 };
 
 class EnemyCharacter : public Character {
@@ -155,7 +232,7 @@ public:
         return TIME_REMAINING_ENEMY;
     }
 
+    bool isMainCharacter() override;
 };
-
 
 #endif //TANK_MAZE_CHARACTER_H

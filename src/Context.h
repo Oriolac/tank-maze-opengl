@@ -29,11 +29,15 @@ public:
         return enemy_character;
     }
 
-    void move(Direction direction);
+    void move_main(Direction direction);
 
     void move_enemy(Direction direction);
 
-    bool check_can_move(const Direction &direction, const pair<int, int> &coords, Character *pCharacter);
+    void integrate(Character *pCharacter, int i);
+
+    bool check_can_move_if_forward(const pair<int, int> &coords, Character *pCharacter, Character *otherCharacter);
+
+    bool check_can_go_forward(Character *pCharacter);
 };
 
 
