@@ -148,9 +148,10 @@ void screen_display() {
     glMatrixMode(GL_MODELVIEW);
     glPushMatrix();
     glLoadIdentity();
-    glTranslatef(WIDTH * 3/ 5, HEIGHT * 9/10, 1);
-    glScalef(scale, scale, 1);
     string s = "Time left:";
+    int x_chars = (s.length() + 3) * 90 * scale;
+    glTranslatef(WIDTH - x_chars, HEIGHT * 9/10, 1);
+    glScalef(scale, scale, 1);
     s = s.append(std::to_string((int) time_left));
     void *font = GLUT_STROKE_MONO_ROMAN;
     int x = 0;
