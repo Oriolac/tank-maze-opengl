@@ -1,6 +1,7 @@
 //
 // Created by oriol on 10/6/21.
 //
+
 #define TIME_REMAINING_MAIN 200
 #define TIME_REMAINING_ENEMY 200
 
@@ -168,34 +169,8 @@ public:
 
     void draw(COLOR_ARG_FACE, COLOR_ARG_BACK) {
         update_state();
-        glBegin(GL_TRIANGLES);
-        glColor3f(COLOR_PARAM_FACE);
-        glVertex3d(x_middle, y_start, HEIGHT_TANK);
-        glColor3f(COLOR_PARAM_BACK);
-        glVertex3d(x_finish, y_finish, HEIGHT_TANK);
-        glVertex3d(x_start, y_finish, HEIGHT_TANK);
-        glEnd();
-
-        glBegin(GL_QUADS);
-        glVertex3d(x_middle, y_start, HEIGHT_TANK);
-        glVertex3d(x_middle, y_start, 0);
-        glVertex3d(x_finish, y_finish, 0);
-        glVertex3d(x_finish, y_finish, HEIGHT_TANK);
-        glEnd();
-
-        glBegin(GL_QUADS);
-        glVertex3d(x_middle, y_start, 0);
-        glVertex3d(x_middle, y_start, HEIGHT_TANK);
-        glVertex3d(x_start, y_finish, HEIGHT_TANK);
-        glVertex3d(x_start, y_finish, 0);
-        glEnd();
-
-        glBegin(GL_QUADS);
-        glVertex3d(x_start, y_finish, 0);
-        glVertex3d(x_start, y_finish, HEIGHT_TANK);
-        glVertex3d(x_finish, y_finish, HEIGHT_TANK);
-        glVertex3d(x_finish, y_finish, 0);
-        glEnd();
+        float colors[3] = {redF, greenF, blueF};
+        Tank::drawTank(tile_side_length, tile_side_length, tile_side_length, colors, x, y);
     }
 
     Orientation getOrientation();

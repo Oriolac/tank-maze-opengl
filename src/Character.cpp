@@ -1,10 +1,11 @@
 //
 // Created by oriol on 10/6/21.
 //
+
+#include "utils/tank.cpp"
 #include <GL/glut.h>
 #include "Character.h"
 #include "utils/graphics.h"
-
 
 std::pair<int, int> Character:: getCoords() {
     return {this->xTile, this->yTile};
