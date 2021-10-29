@@ -10,6 +10,7 @@
 void Context::move_main(Direction direction) {
     if (direction == Direction::FORWARD && main_character->getDirection() == Direction::STOPPED)
         return;
+
     if (direction != Direction::FORWARD || check_can_go_forward(getMainCharacter()))
         main_character->move(direction);
 }
@@ -17,8 +18,9 @@ void Context::move_main(Direction direction) {
 void Context::move_enemy(Direction direction) {
     if (direction == Direction::FORWARD && enemy_character->getDirection() == Direction::STOPPED)
         return;
-    if (direction != Direction::FORWARD || check_can_go_forward(getEnemyCharacter()))
+    if (direction != Direction::FORWARD || check_can_go_forward(getEnemyCharacter())) {
         enemy_character->move(direction);
+    }
 }
 
 bool

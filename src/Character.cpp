@@ -35,11 +35,13 @@ Direction Character::nextDirection() {
 
 MainCharacter::MainCharacter(std::pair<int, int> coords, int tile_side_length) : Character(coords, tile_side_length) {
     draw(COLORTUP_MAIN_FACE_VERTEX, COLORTUP_MAIN_BACK_VERTEX);
+    currentDegree = 270;
 }
 
 EnemyCharacter::EnemyCharacter(pair<int, int> coords, int tile_side_length) : Character(coords, tile_side_length) {
     draw(COLORTUP_ENEMY_FACE_VERTEX, COLORTUP_MAIN_BACK_VERTEX);
     orientation = Orientation::UP;
+    currentDegree = 90;
 }
 
 bool EnemyCharacter::isMainCharacter() {

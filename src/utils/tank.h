@@ -8,12 +8,12 @@
 
 class Tank{
     public:
-        static void drawTank(int size_x, int size_y, int size_z, float color[3], float x_pos, float y_pos);
+        static void drawTank(int size_x, int size_y, int size_z, float color[3], float x_pos, float y_pos, float current_degree);
     private:
-        static void drawWheels(int size_x, int size_y, int size_z, float x_pos, float y_pos);
-        static void drawBase(int size_x, int size_y, int size_z, float color[3], float x_pos, float y_pos);
-        static void drawCavin(int size_x, int size_y, int size_z, float color[3], float x_pos, float y_pos);
-        static void drawCannon(int size_x, int size_y, int size_z, float x_pos, float y_pos);
+        static void drawWheels(int size_x, int size_y, int size_z);
+        static void drawBase(int size_x, int size_y, int size_z, float color[3]);
+        static void drawCavin(int size_x, int size_y, int size_z, float color[3]);
+        static void drawCannon(int size_x, int size_y, int size_z);
 };
 
 

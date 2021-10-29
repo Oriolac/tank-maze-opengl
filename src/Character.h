@@ -60,15 +60,15 @@ protected:
     int xTile, yTile;
     double x, y;
     double vX, vY;
+    double velRotate;
+    double currentDegree;
     int tile_side_length;
-    double y_start;
-    double y_finish;
     double x_start;
     double x_finish;
-    double x_middle;
     Direction direction;
     Orientation orientation;
     int time_remaining_movement;
+    int time_remaining_rotation;
     Direction next_direction;
 public:
     Character(pair<int, int> coords, int tile_side_length) {
@@ -83,25 +83,27 @@ public:
         orientation = Orientation::DOWN;
         next_direction = Direction::STOPPED;
         time_remaining_movement = 0;
+        time_remaining_rotation = 0;
         vX = 0;
         vY = 0;
+        velRotate = 0;
     }
 
     void update_state() {
-        y_start = y + variance;
-        y_finish = y + tile_side_length - variance;
         x_start = x + variance;
         x_finish = x + tile_side_length - variance;
-        x_middle = (x_start + x_finish) / 2;
     };
 
     void move(Direction new_direction) {
         next_direction = new_direction;
-        if (direction == Direction::STOPPED && (next_direction == Direction::TURN_RIGHT || next_direction == Direction::TURN_LEFT)) {
+        if (direction == Direction::STOPPED &&
+            (next_direction == Direction::TURN_RIGHT || next_direction == Direction::TURN_LEFT)) {
             direction = next_direction;
             orientation = apply_direction(direction, orientation);
+            calculate_velocity_rotation();
+            time_remaining_rotation = time_remain();
             next_direction = Direction::STOPPED;
-        } else if (next_direction == Direction::FORWARD && direction != Direction::FORWARD) {
+        } else if (next_direction == Direction::FORWARD && direction == Direction::STOPPED) {
             calculate_velocity_and_next_tile();
             time_remaining_movement = time_remain();
             direction = new_direction;
@@ -110,9 +112,23 @@ public:
 
     Orientation apply_direction(Direction direction, Orientation curr_orientation) {
         if (direction == Direction::TURN_RIGHT) {
-            return static_cast<Orientation>((static_cast<int>(curr_orientation) + 3) % 4);
-        } else {
             return static_cast<Orientation>((static_cast<int>(curr_orientation) + 1) % 4);
+        } else {
+            return static_cast<Orientation>((static_cast<int>(curr_orientation) + 3) % 4);
+        }
+    }
+
+    void calculate_velocity_rotation() {
+        switch (direction) {
+            case Direction::TURN_RIGHT:
+                velRotate = (double) 90 / time_remain();
+                break;
+            case Direction::TURN_LEFT:
+                velRotate = (double) (-90) / time_remain();
+                break;
+            default:
+                velRotate = 0;
+                break;
         }
     }
 
@@ -153,10 +169,19 @@ public:
             this->y = y + vY * this->time_remaining_movement;
             direction = Direction::STOPPED;
             return true;
-        } else if (direction == Direction::TURN_RIGHT) {
-            direction = Direction::STOPPED;
-            return true;
-        } else if (direction == Direction::TURN_LEFT) {
+        } else if ((direction == Direction::TURN_RIGHT || direction == Direction::TURN_LEFT) &&
+                   t < this->time_remaining_rotation) {
+            currentDegree = currentDegree + velRotate * t;
+            this->time_remaining_rotation -= t;
+        } else if ((direction == Direction::TURN_RIGHT || direction == Direction::TURN_LEFT) &&
+                   t >= this->time_remaining_rotation) {
+            currentDegree = currentDegree + time_remaining_rotation * velRotate;
+            int noise = (int) abs(currentDegree) % 90;
+            if (noise > 45) {
+                currentDegree = (int) ((currentDegree + 45) / 90) * 90;
+            } else if (noise != 0 && noise <= 45) {
+                currentDegree = (int) ((currentDegree - 45) / 90) * 90;
+            }
             direction = Direction::STOPPED;
             return true;
         }
@@ -170,7 +195,7 @@ public:
     void draw(COLOR_ARG_FACE, COLOR_ARG_BACK) {
         update_state();
         float colors[3] = {redF, greenF, blueF};
-        Tank::drawTank(tile_side_length, tile_side_length, tile_side_length, colors, x, y);
+        Tank::drawTank(tile_side_length, tile_side_length, tile_side_length, colors, x, y, currentDegree);
     }
 
     Orientation getOrientation();
