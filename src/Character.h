@@ -112,9 +112,19 @@ public:
 
     Orientation apply_direction(Direction direction, Orientation curr_orientation) {
         if (direction == Direction::TURN_RIGHT) {
-            return static_cast<Orientation>((static_cast<int>(curr_orientation) + 1) % 4);
+            return apply_direction_on_orientation(curr_orientation, 1, 3);
         } else {
-            return static_cast<Orientation>((static_cast<int>(curr_orientation) + 3) % 4);
+            return apply_direction_on_orientation(curr_orientation, 3, 1);
+        }
+    }
+
+    Orientation apply_direction_on_orientation(const Orientation &curr_orientation, int a, int b) const {
+        switch (orientation){
+            case Orientation::DOWN:
+            case Orientation::RIGHT:
+                return static_cast<Orientation>((static_cast<int>(curr_orientation) + a) % 4);
+            default:
+                return static_cast<Orientation>((static_cast<int>(curr_orientation) + b) % 4);
         }
     }
 
