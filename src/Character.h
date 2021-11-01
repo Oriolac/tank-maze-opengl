@@ -17,40 +17,46 @@
 
 
 enum class Direction {
-    FORWARD, TURN_LEFT, TURN_RIGHT, STOPPED
+    FORWARD, TURN_LEFT, TURN_RIGHT, TURN_UP, TURN_DOWN, STOPPED
 };
+
 
 inline const char *ToString(Direction v) {
     switch (v) {
         case Direction::FORWARD:
-            return "FORWARD";
+            return "FORWARD\n";
         case Direction::TURN_LEFT:
-            return "TURN_LEFT";
+            return "TURN_LEFT\n";
         case Direction::TURN_RIGHT:
-            return "TURN_RIGHT";
+            return "TURN_RIGHT\n";
+        case Direction::TURN_UP:
+            return "TURN_UP\n";
+        case Direction::TURN_DOWN:
+            return "TURN_DOWN\n";
         case Direction::STOPPED:
-            return "STOPPED";
+            return "STOPPED\n";
         default:
-            return "[Unknown OS_type]";
+            return "[Unknown OS_type]\n";
     }
 }
 
 enum class Orientation {
-    UP, LEFT, DOWN, RIGHT
+    UP, RIGHT, DOWN, LEFT
 };
+
 
 inline const char *ToString(Orientation v) {
     switch (v) {
         case Orientation::UP:
-            return "UP";
+            return "UP\n";
         case Orientation::DOWN:
-            return "DOWN";
+            return "DOWN\n";
         case Orientation::LEFT:
-            return "LEFT";
+            return "LEFT\n";
         case Orientation::RIGHT:
-            return "RIGHT";
+            return "RIGHT\n";
         default:
-            return "[Unknown OS_type]";
+            return "[Unknown OS_type]\n";
     }
 }
 
@@ -97,10 +103,12 @@ public:
     void move(Direction new_direction) {
         next_direction = new_direction;
         if (direction == Direction::STOPPED &&
-            (next_direction == Direction::TURN_RIGHT || next_direction == Direction::TURN_LEFT)) {
+            (next_direction == Direction::TURN_RIGHT || next_direction == Direction::TURN_LEFT
+            || next_direction == Direction::TURN_UP ||  next_direction == Direction::TURN_DOWN)) {
+
             direction = next_direction;
-            orientation = apply_direction(direction, orientation);
             calculate_velocity_rotation();
+            orientation = get_new_orientation(direction, orientation);
             time_remaining_rotation = time_remain();
             next_direction = Direction::STOPPED;
         } else if (next_direction == Direction::FORWARD && direction == Direction::STOPPED) {
@@ -110,36 +118,46 @@ public:
         }
     }
 
-    Orientation apply_direction(Direction direction, Orientation curr_orientation) {
-        if (direction == Direction::TURN_RIGHT) {
-            return apply_direction_on_orientation(curr_orientation, 1, 3);
-        } else {
-            return apply_direction_on_orientation(curr_orientation, 3, 1);
-        }
+    bool is_inverse(Direction direction, Orientation curr_orientation){
+        return (curr_orientation == Orientation::UP && direction == Direction::TURN_DOWN)
+                || (curr_orientation == Orientation::DOWN && direction == Direction::TURN_UP)
+                || (curr_orientation == Orientation::RIGHT && direction == Direction::TURN_LEFT)
+                || (curr_orientation == Orientation::LEFT && direction == Direction::TURN_RIGHT);
     }
 
-    Orientation apply_direction_on_orientation(const Orientation &curr_orientation, int a, int b) const {
-        switch (orientation){
-            case Orientation::DOWN:
-            case Orientation::RIGHT:
-                return static_cast<Orientation>((static_cast<int>(curr_orientation) + a) % 4);
-            default:
-                return static_cast<Orientation>((static_cast<int>(curr_orientation) + b) % 4);
+
+    Orientation get_new_orientation(Direction direction, Orientation curr_orientation){
+        if(!is_inverse(direction, curr_orientation)){
+            if (direction == Direction::TURN_RIGHT){
+                return Orientation::RIGHT;
+            }else if (direction == Direction::TURN_LEFT){
+                return Orientation::LEFT;
+            }else if (direction == Direction::TURN_UP){
+                return Orientation::UP;
+            }else{
+                return  Orientation::DOWN;
+            }
+        }else{
+            return curr_orientation;
         }
     }
 
     void calculate_velocity_rotation() {
-        switch (direction) {
-            case Direction::TURN_RIGHT:
-                velRotate = (double) 90 / time_remain();
-                break;
-            case Direction::TURN_LEFT:
-                velRotate = (double) (-90) / time_remain();
-                break;
-            default:
-                velRotate = 0;
-                break;
+        if (!is_inverse(direction, orientation)){
+            velRotate = (double) (rotation_sign(direction, orientation) * 90) / time_remain();
+        }else{
+            velRotate = 0;
         }
+    }
+
+    int rotation_sign(Direction direction, Orientation curr_orientation){
+        if ((curr_orientation == Orientation::UP && direction == Direction::TURN_LEFT)
+            || (curr_orientation == Orientation::LEFT && direction == Direction::TURN_DOWN)
+            || (curr_orientation == Orientation::DOWN && direction == Direction::TURN_RIGHT)
+            || (curr_orientation == Orientation::RIGHT && direction == Direction::TURN_UP)){
+            return 1;
+        }
+        return -1;
     }
 
     void calculate_velocity_and_next_tile() {
@@ -179,11 +197,11 @@ public:
             this->y = y + vY * this->time_remaining_movement;
             direction = Direction::STOPPED;
             return true;
-        } else if ((direction == Direction::TURN_RIGHT || direction == Direction::TURN_LEFT) &&
+        } else if ((direction == Direction::TURN_UP || direction == Direction::TURN_DOWN || direction == Direction::TURN_RIGHT || direction == Direction::TURN_LEFT) &&
                    t < this->time_remaining_rotation) {
             currentDegree = currentDegree + velRotate * t;
             this->time_remaining_rotation -= t;
-        } else if ((direction == Direction::TURN_RIGHT || direction == Direction::TURN_LEFT) &&
+        } else if ((direction == Direction::TURN_UP || direction == Direction::TURN_DOWN || direction == Direction::TURN_RIGHT || direction == Direction::TURN_LEFT) &&
                    t >= this->time_remaining_rotation) {
             currentDegree = currentDegree + time_remaining_rotation * velRotate;
             int noise = (int) abs(currentDegree) % 90;
