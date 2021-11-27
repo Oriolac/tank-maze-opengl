@@ -52,6 +52,8 @@ void create_position_observer(int anglealpha, int anglebeta, int radi);
 
 void addPath(int i, int j, Color color, float height);
 
+void ambient_light_display();
+
 int main(int argc, char **argv) {
     if (argc < 4 || argc > 5) {
         printf("Usage:\n\t./game [<rows>=20 <cols>=20 --func={dfs, heur} [--print]]\n");
@@ -118,6 +120,7 @@ void config_opengl(int &argc, char **argv) {
     glutCreateWindow("GraphDfsHeur");
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_TEXTURE_2D);
+    glEnable(GL_LIGHTING);
 
     glutDisplayFunc(display);
     glutKeyboardFunc(keyboard);
@@ -153,6 +156,8 @@ void screen_display() {
     glLoadIdentity();
     gluOrtho2D(0.0, WIDTH, 0.0, HEIGHT);
     glMatrixMode(GL_MODELVIEW);
+
+    ambient_light_display();
     glPushMatrix();
     glLoadIdentity();
     string s = "Time left:";
@@ -173,6 +178,13 @@ void screen_display() {
     glPopMatrix();
     glMatrixMode(GL_MODELVIEW);
     glPopMatrix();
+}
+
+void ambient_light_display() {
+    int color[4];
+    color[0] = 0.1; color[1] = 0.1; color[2] = 0.1; color[3] = 1;
+    glLightiv(GL_LIGHT0, GL_AMBIENT, color);
+    glEnable(GL_LIGHT0);
 }
 
 void maze_display() {
