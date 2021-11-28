@@ -9,6 +9,7 @@
 #include "Context.cpp"
 #include "maze_gen/backtraking.cpp"
 #include <memory>
+#include "utils/textures.cpp"
 
 #define SIDE_LENGTH 40
 
@@ -116,11 +117,17 @@ void config_opengl(int &argc, char **argv) {
     glutInitWindowSize(WIDTH, HEIGHT);
     glutCreateWindow("GraphDfsHeur");
     glEnable(GL_DEPTH_TEST);
+    glEnable(GL_TEXTURE_2D);
 
     glutDisplayFunc(display);
     glutKeyboardFunc(keyboard);
     glutIdleFunc(idle);
 
+    glBindTexture(GL_TEXTURE_2D, TEXTURE_STONE);
+    LoadTexture(std::string("textures/stone.jpeg").c_str(), 512);
+    glBindTexture(GL_TEXTURE_2D, TEXTURE_GRASS);
+    LoadTexture(std::string("textures/grass.jpg").c_str(), 512);
+    glDisable(GL_TEXTURE_2D);
     glutMainLoop();
 }
 
@@ -278,74 +285,76 @@ void addSquare(int i, int j, struct Color color, int height) {
     glMatrixMode(GL_MODELVIEW);
     glPolygonMode(GL_FRONT, GL_FILL);
     glColor3f(color.red, color.green, color.blue);
+    glBindTexture(GL_TEXTURE_2D, TEXTURE_STONE);
+    glEnable(GL_TEXTURE_2D);
     glBegin(GL_QUADS);
-    glVertex3f(i * WIDTH / COLUMNS, j * HEIGHT / ROWS, height);
-    glVertex3f((i + 1) * WIDTH / COLUMNS, j * HEIGHT / ROWS, height);
-    glVertex3f((i + 1) * WIDTH / COLUMNS, (j + 1) * HEIGHT / ROWS, height);
-    glVertex3f(i * WIDTH / COLUMNS, (j + 1) * HEIGHT / ROWS, height);
+    glTexCoord2f(0.0, 0.0); glVertex3f(i * WIDTH / COLUMNS, j * HEIGHT / ROWS, height);
+    glTexCoord2f(1.0, 0.0); glVertex3f((i + 1) * WIDTH / COLUMNS, j * HEIGHT / ROWS, height);
+    glTexCoord2f(1.0, 1.0); glVertex3f((i + 1) * WIDTH / COLUMNS, (j + 1) * HEIGHT / ROWS, height);
+    glTexCoord2f(0.0, 1.0); glVertex3f(i * WIDTH / COLUMNS, (j + 1) * HEIGHT / ROWS, height);
     glEnd();
 
     glColor3f(0, 0, 0);
     glBegin(GL_QUADS);
-    glVertex3f(i * WIDTH / COLUMNS, j * HEIGHT / ROWS, FLOOR);
-    glVertex3f(i * WIDTH / COLUMNS, (j + 1) * HEIGHT / ROWS, FLOOR);
-    glVertex3f((i + 1) * WIDTH / COLUMNS, (j + 1) * HEIGHT / ROWS, FLOOR);
-    glVertex3f((i + 1) * WIDTH / COLUMNS, j * HEIGHT / ROWS, FLOOR);
+    glTexCoord2f(0.0, 0.0); glVertex3f(i * WIDTH / COLUMNS, j * HEIGHT / ROWS, FLOOR);
+    glTexCoord2f(0.0, 1.0); glVertex3f(i * WIDTH / COLUMNS, (j + 1) * HEIGHT / ROWS, FLOOR);
+    glTexCoord2f(1.0, 1.0); glVertex3f((i + 1) * WIDTH / COLUMNS, (j + 1) * HEIGHT / ROWS, FLOOR);
+    glTexCoord2f(1.0, 0.0); glVertex3f((i + 1) * WIDTH / COLUMNS, j * HEIGHT / ROWS, FLOOR);
     glEnd();
 
     glColor3f(COLORTUP_WALL_SIDE);
     glBegin(GL_QUADS);
-    glVertex3f(i * WIDTH / COLUMNS, ((j + 1) * HEIGHT / ROWS), height);
-    glVertex3f((i + 1) * WIDTH / COLUMNS, (j + 1) * HEIGHT / ROWS, height);
-    glVertex3f((i + 1) * WIDTH / COLUMNS, (j + 1) * HEIGHT / ROWS, FLOOR);
-    glVertex3f(i * WIDTH / COLUMNS, (j + 1) * HEIGHT / ROWS, FLOOR);
+    glTexCoord2f(0.0, 0.0); glVertex3f(i * WIDTH / COLUMNS, ((j + 1) * HEIGHT / ROWS), height);
+    glTexCoord2f(0.0, 1.0); glVertex3f((i + 1) * WIDTH / COLUMNS, (j + 1) * HEIGHT / ROWS, height);
+    glTexCoord2f(1.0, 1.0); glVertex3f((i + 1) * WIDTH / COLUMNS, (j + 1) * HEIGHT / ROWS, FLOOR);
+    glTexCoord2f(1.0, 0.0); glVertex3f(i * WIDTH / COLUMNS, (j + 1) * HEIGHT / ROWS, FLOOR);
     glEnd();
 
     glColor3f(COLORTUP_WALL_SIDE);
     glBegin(GL_QUADS);
-    glVertex3f(i * WIDTH / COLUMNS, j * HEIGHT / ROWS, FLOOR);
-    glVertex3f((i + 1) * WIDTH / COLUMNS, j * HEIGHT / ROWS, FLOOR);
-    glVertex3f((i + 1) * WIDTH / COLUMNS, j * HEIGHT / ROWS, height);
-    glVertex3f(i * WIDTH / COLUMNS, j * HEIGHT / ROWS, height);
+    glTexCoord2f(0.0, 0.0); glVertex3f(i * WIDTH / COLUMNS, j * HEIGHT / ROWS, FLOOR);
+    glTexCoord2f(1.0, 0.0); glVertex3f((i + 1) * WIDTH / COLUMNS, j * HEIGHT / ROWS, FLOOR);
+    glTexCoord2f(1.0, 1.0); glVertex3f((i + 1) * WIDTH / COLUMNS, j * HEIGHT / ROWS, height);
+    glTexCoord2f(0.0, 1.0); glVertex3f(i * WIDTH / COLUMNS, j * HEIGHT / ROWS, height);
     glEnd();
-
 
     glColor3f(COLORTUP_WALL_SIDE);
     glBegin(GL_QUADS);
-    glVertex3f(i * WIDTH / COLUMNS, j * HEIGHT / ROWS, height);
-    glVertex3f(i * WIDTH / COLUMNS, (j + 1) * HEIGHT / ROWS, height);
-    glVertex3f(i * WIDTH / COLUMNS, (j + 1) * HEIGHT / ROWS, FLOOR);
-    glVertex3f(i * WIDTH / COLUMNS, j * HEIGHT / ROWS, FLOOR);
+    glTexCoord2f(0.0, 0.0); glVertex3f(i * WIDTH / COLUMNS, j * HEIGHT / ROWS, height);
+    glTexCoord2f(0.0, 1.0); glVertex3f(i * WIDTH / COLUMNS, (j + 1) * HEIGHT / ROWS, height);
+    glTexCoord2f(1.0, 1.0); glVertex3f(i * WIDTH / COLUMNS, (j + 1) * HEIGHT / ROWS, FLOOR);
+    glTexCoord2f(1.0, 0.0); glVertex3f(i * WIDTH / COLUMNS, j * HEIGHT / ROWS, FLOOR);
     glEnd();
-
 
     glColor3f(COLORTUP_WALL_SIDE);
     glBegin(GL_QUADS);
-    glVertex3f((i + 1) * WIDTH / COLUMNS, j * HEIGHT / ROWS, height);
-    glVertex3f((i + 1) * WIDTH / COLUMNS, j * HEIGHT / ROWS, FLOOR);
-    glVertex3f((i + 1) * WIDTH / COLUMNS, (j + 1) * HEIGHT / ROWS, FLOOR);
-    glVertex3f((i + 1) * WIDTH / COLUMNS, (j + 1) * HEIGHT / ROWS, height);
+    glTexCoord2f(0.0, 0.0); glVertex3f((i + 1) * WIDTH / COLUMNS, j * HEIGHT / ROWS, height);
+    glTexCoord2f(0.0, 1.0); glVertex3f((i + 1) * WIDTH / COLUMNS, j * HEIGHT / ROWS, FLOOR);
+    glTexCoord2f(1.0, 1.0); glVertex3f((i + 1) * WIDTH / COLUMNS, (j + 1) * HEIGHT / ROWS, FLOOR);
+    glTexCoord2f(1.0, 0.0); glVertex3f((i + 1) * WIDTH / COLUMNS, (j + 1) * HEIGHT / ROWS, height);
     glEnd();
 
+    glDisable(GL_TEXTURE_2D);
 }
 
 void addPath(int i, int j, Color color, float height) {
     glMatrixMode(GL_MODELVIEW);
     glPolygonMode(GL_FRONT, GL_FILL);
     glColor3f(color.red, color.green, color.blue);
+    glBindTexture(GL_TEXTURE_2D, TEXTURE_GRASS);
+    glEnable(GL_TEXTURE_2D);
     glBegin(GL_QUADS);
-
-    glVertex3f(i * WIDTH / COLUMNS, j * HEIGHT / ROWS, height);
-    glVertex3f((i + 1) * WIDTH / COLUMNS, j * HEIGHT / ROWS, height);
-    glVertex3f((i + 1) * WIDTH / COLUMNS, (j + 1) * HEIGHT / ROWS, height);
-    glVertex3f(i * WIDTH / COLUMNS, (j + 1) * HEIGHT / ROWS, height);
-
-    glBegin(GL_QUADS);
-    glVertex3f(i * WIDTH / COLUMNS, j * HEIGHT / ROWS, height);
-    glVertex3f(i * WIDTH / COLUMNS, (j + 1) * HEIGHT / ROWS, height);
-    glVertex3f((i + 1) * WIDTH / COLUMNS, (j + 1) * HEIGHT / ROWS, height);
-    glVertex3f((i + 1) * WIDTH / COLUMNS, j * HEIGHT / ROWS, height);
+    glTexCoord2f(0.0, 0.0); glVertex3f(i * WIDTH / COLUMNS, j * HEIGHT / ROWS, height);
+    glTexCoord2f(1, 0.0); glVertex3f((i + 1) * WIDTH / COLUMNS, j * HEIGHT / ROWS, height);
+    glTexCoord2f(1.0, 1.0); glVertex3f((i + 1) * WIDTH / COLUMNS, (j + 1) * HEIGHT / ROWS, height);
+    glTexCoord2f(0.0,  1.0); glVertex3f(i * WIDTH / COLUMNS, (j + 1) * HEIGHT / ROWS, height);
     glEnd();
 
+    glBegin(GL_QUADS);
+    glTexCoord2f(0.0, 0.0); glVertex3f(i * WIDTH / COLUMNS, j * HEIGHT / ROWS, height);
+    glTexCoord2f(0.0, 1.0); glVertex3f(i * WIDTH / COLUMNS, (j + 1) * HEIGHT / ROWS, height);
+    glTexCoord2f(1.0, 1.0); glVertex3f((i + 1) * WIDTH / COLUMNS, (j + 1) * HEIGHT / ROWS, height);
+    glTexCoord2f(1.0, 0.0); glVertex3f((i + 1) * WIDTH / COLUMNS, j * HEIGHT / ROWS, height);
     glEnd();
+    glDisable(GL_TEXTURE_2D);
 }
