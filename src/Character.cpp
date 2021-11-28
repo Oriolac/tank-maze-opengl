@@ -8,9 +8,10 @@
 #include "utils/graphics.h"
 
 std::vector<GLfloat> Character::getLightDirection() {
+
     switch (this->orientation) {
         case Orientation::UP:
-            return {1, 1, 0};
+            return {0, 1, 0};
         case Orientation::DOWN:
             return {0, -1, 0};
         case Orientation::RIGHT:
@@ -72,15 +73,15 @@ void Character::drawLight() {
     GLfloat lightOrientation[] = {orientation[0], orientation[1], orientation[2]};
     glLightfv(this->light, GL_SPOT_DIRECTION, lightOrientation); // direction
 
-    glLightf(light, GL_SPOT_CUTOFF, 20); // degrees
+    glLightf(light, GL_SPOT_CUTOFF, 40); // degrees
     glLightf(light, GL_SPOT_EXPONENT, 10);
 
     pair<int, int> coords = this->getCoords();
     float position[4];
     float plusY = orientation[1] == 1 ? 45: 0;
-    position[0] = x + 40;
-    position[1] = y+ 40 + 20;
-    position[2] = 0;
+    position[0] = x + 20;
+    position[1] = y + 20;
+    position[2] = 1;
     position[3] = 1;
     glLightfv(light, GL_POSITION, position);
     GLfloat color[] = {0.8,0.8,0.8,1};
