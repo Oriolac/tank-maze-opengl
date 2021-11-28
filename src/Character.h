@@ -1,6 +1,8 @@
 //
 // Created by oriol on 10/6/21.
 //
+#include <GL/glut.h>
+#include <vector>
 
 #define TIME_REMAINING_MAIN 200
 #define TIME_REMAINING_ENEMY 200
@@ -72,6 +74,7 @@ protected:
     int time_remaining_movement;
     int time_remaining_rotation;
     Direction next_direction;
+    GLenum light;
 public:
     Character(pair<int, int> coords, int tile_side_length) {
         xTile = coords.first;
@@ -89,6 +92,7 @@ public:
         vX = 0;
         vY = 0;
         velRotate = 0;
+        light = GL_LIGHT1;
     }
 
     void update_state() {
@@ -230,6 +234,8 @@ public:
         Tank::drawTank(tile_side_length, tile_side_length, tile_side_length, colors, x, y, currentDegree);
     }
 
+    void drawLight();
+
     Orientation getOrientation();
 
     Direction getDirection();
@@ -243,6 +249,8 @@ public:
     }
 
     Direction nextDirection();
+
+    std::vector<GLfloat> getLightDirection();
 };
 
 class MainCharacter : public Character {

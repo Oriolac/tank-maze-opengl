@@ -2,6 +2,7 @@
 // Created by quimpm on 17/10/21.
 //
 
+#include <vector>
 #include "tank.h"
 #include "textures.h"
 //
@@ -22,6 +23,7 @@ void Tank::drawTank(int size_x, int size_y, int size_z, float color[3], float x_
     drawCannon(size_x, size_y, size_z, color);
     glPopMatrix();
     glPopMatrix();
+
 }
 
 void Tank::drawWheels(int size_x, int size_y, int size_z){

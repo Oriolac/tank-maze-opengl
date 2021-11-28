@@ -7,9 +7,8 @@
 
 #define COLOR_WALL Color(0.55, 0.55, 0.7)
 #define COLOR_PATH Color(0.55, 0.9, 0.55)
-#define COLORTUP_WALL_SIDE 0.3, 0.2, 0.6
-#define COLORTUP_MAIN_FACE_VERTEX 0.2, 0.3, 0.5
-#define COLORTUP_ENEMY_FACE_VERTEX 0.5, 0.3, 0.2
+#define COLORTUP_MAIN_FACE_VERTEX 0.1, 0.2, 0.4
+#define COLORTUP_ENEMY_FACE_VERTEX 0.4, 0.2, 0.1
 
 
 struct Color {

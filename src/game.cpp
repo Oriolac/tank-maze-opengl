@@ -14,10 +14,10 @@
 #define SIDE_LENGTH 40
 
 #define PI 3.1416
-#define BACKGROUND_COLOR 0.75, 0.75, 0.9, 0.0
+#define BACKGROUND_COLOR 0.3, 0.3, 0.5, 0.0
 
 #define FLOOR 0
-Context *context;
+std::shared_ptr<Context> context;
 std::shared_ptr<GraphInterface> graph;
 int COLUMNS;
 int ROWS;
@@ -27,6 +27,7 @@ int anglebeta = 0;
 int anglealpha = 0;
 double time_maze = 60;
 double time_left = time_maze;
+std::shared_ptr<Dimensions> dimensions;
 
 int last_t = 0;
 
@@ -42,11 +43,13 @@ void maze_display();
 
 void characters_display();
 
+void characters_light();
+
 void keyboard(unsigned char c, int x, int y);
 
 void idle();
 
-bool get_opt_args(int argc, char *const *argv, const Dimensions &dimensions);
+bool get_opt_args(int argc, char *const *argv);
 
 void create_position_observer(int anglealpha, int anglebeta, int radi);
 
@@ -61,19 +64,20 @@ int main(int argc, char **argv) {
     }
     anglealpha = 90;
     anglebeta = -2;
-    Dimensions dimensions = getDimensions(argc, argv);
-    bool mustPrint = get_opt_args(argc, argv, dimensions);
+    Dimensions new_dimensions = getDimensions(argc, argv);
+    dimensions = make_shared<Dimensions>(new_dimensions);
+    bool mustPrint = get_opt_args(argc, argv);
     graph->start();
     if (mustPrint)
         graph->print();
     MainCharacter main_character = MainCharacter(graph->get_main_coords(), SIDE_LENGTH);
     EnemyCharacter enemy_character = EnemyCharacter(graph->get_enemy_coords(), SIDE_LENGTH);
     Context new_cont = Context(graph, &main_character, &enemy_character);
-    context = &new_cont;
+    context = make_shared<Context>(new_cont);
     config_opengl(argc, argv);
 }
 
-bool get_opt_args(int argc, char *const *argv, const Dimensions &dimensions) {
+bool get_opt_args(int argc, char *const *argv) {
     bool mustPrint;
     for (int i = 3; i < argc; i++) {
         string s = argv[i];
@@ -86,14 +90,14 @@ bool get_opt_args(int argc, char *const *argv, const Dimensions &dimensions) {
             s.erase(0, pos + delimiter.length());
             tok = s.substr(0, pos + 1);
             if (equal(tok.begin(), tok.end(), string("heur").begin())) {
-                GraphDfsHeur graphHeur = GraphDfsHeur(dimensions.cols, dimensions.rows);
+                GraphDfsHeur graphHeur = GraphDfsHeur(dimensions->cols, dimensions->rows);
                 graph = make_shared<GraphDfsHeur>(graphHeur);
                 if (!graph) {
                     printf("malloc failed\n");
                     exit(-1);
                 }
             } else if (equal(tok.begin(), tok.end(), string("dfs").begin())) {
-                GraphDFS graphDfs = GraphDFS(dimensions.cols, dimensions.rows);
+                GraphDFS graphDfs = GraphDFS(dimensions->cols, dimensions->rows);
                 graph = make_shared<GraphDFS>(graphDfs);
                 if (!graph) {
                     printf("malloc failed\n");
@@ -142,6 +146,7 @@ void display() {
     characters_display();
     screen_display();
     ambient_light_display();
+    characters_light();
     glutSwapBuffers();
 }
 
@@ -149,6 +154,12 @@ void characters_display() {
     context->getMainCharacter()->draw(COLORTUP_MAIN_FACE_VERTEX);
     context->getEnemyCharacter()->draw(COLORTUP_ENEMY_FACE_VERTEX);
 }
+
+void characters_light() {
+    context->getMainCharacter()->drawLight();
+    context->getEnemyCharacter()->drawLight();
+}
+
 
 void screen_display() {
     float scale = 0.2;
@@ -181,14 +192,14 @@ void screen_display() {
 }
 
 void ambient_light_display() {
-    GLfloat position[4];
     GLfloat color[4];
-    color[0] = 0.3;
-    color[1] = 0.3;
-    color[2] = 0.3;
+    color[0] = 0.1;
+    color[1] = 0.1;
+    color[2] = 0.1;
     color[3] = 1;
     glLightfv(GL_LIGHT0, GL_AMBIENT, color);
     glEnable(GL_LIGHT0);
+    glEnable(GL_NORMALIZE);
 }
 
 void maze_display() {
@@ -287,7 +298,7 @@ void idle() {
         context->integrate(context->getEnemyCharacter(), t - last_t);
         last_t = t;
     }
-    int num = rand() % 20;
+    int num = rand() % 100;
     if (num == 7) {
         context->move_enemy(static_cast<Direction>(rand() % 5));
     }
@@ -323,7 +334,6 @@ void addSquare(int i, int j, struct Color color, int height) {
     glVertex3f((i + 1) * WIDTH / COLUMNS, j * HEIGHT / ROWS, FLOOR);
     glEnd();
 
-    glColor3f(COLORTUP_WALL_SIDE);
     glBegin(GL_QUADS);
     glTexCoord2f(0.0, 0.0);
     glVertex3f(i * WIDTH / COLUMNS, ((j + 1) * HEIGHT / ROWS), height);
@@ -335,7 +345,6 @@ void addSquare(int i, int j, struct Color color, int height) {
     glVertex3f(i * WIDTH / COLUMNS, (j + 1) * HEIGHT / ROWS, FLOOR);
     glEnd();
 
-    glColor3f(COLORTUP_WALL_SIDE);
     glBegin(GL_QUADS);
     glTexCoord2f(0.0, 0.0);
     glVertex3f(i * WIDTH / COLUMNS, j * HEIGHT / ROWS, FLOOR);
@@ -347,7 +356,6 @@ void addSquare(int i, int j, struct Color color, int height) {
     glVertex3f(i * WIDTH / COLUMNS, j * HEIGHT / ROWS, height);
     glEnd();
 
-    glColor3f(COLORTUP_WALL_SIDE);
     glBegin(GL_QUADS);
     glTexCoord2f(0.0, 0.0);
     glVertex3f(i * WIDTH / COLUMNS, j * HEIGHT / ROWS, height);
@@ -359,7 +367,6 @@ void addSquare(int i, int j, struct Color color, int height) {
     glVertex3f(i * WIDTH / COLUMNS, j * HEIGHT / ROWS, FLOOR);
     glEnd();
 
-    glColor3f(COLORTUP_WALL_SIDE);
     glBegin(GL_QUADS);
     glTexCoord2f(0.0, 0.0);
     glVertex3f((i + 1) * WIDTH / COLUMNS, j * HEIGHT / ROWS, height);
