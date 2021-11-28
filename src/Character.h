@@ -97,7 +97,7 @@ public:
     };
 
     void move(Direction new_direction) {
-        if(!is_same_direction(new_direction, orientation) && !is_inverse(new_direction, orientation)){
+        if(!is_same_direction(new_direction, orientation) && !is_inverse(new_direction, orientation)  && new_direction != direction ){
             next_direction = new_direction;
             if (direction == Direction::STOPPED &&
                 (next_direction == Direction::TURN_RIGHT || next_direction == Direction::TURN_LEFT
@@ -108,11 +108,13 @@ public:
                 time_remaining_rotation = time_remain();
                 next_direction = Direction::STOPPED;
             } else if (next_direction == Direction::FORWARD && direction == Direction::STOPPED) {
-                printf("direaction: %s", ToString(next_direction));
-                printf("orientation: %s", ToString(orientation));
                 calculate_velocity_and_next_tile();
                 time_remaining_movement = time_remain();
                 direction = new_direction;
+            }
+            if(!isMainCharacter()){
+                printf("direaction: %s", ToString(next_direction));
+                printf("orientation: %s", ToString(orientation));
             }
         }
     }
@@ -138,8 +140,10 @@ public:
                 return Orientation::LEFT;
             }else if (direction == Direction::TURN_UP){
                 return Orientation::UP;
-            }else{
+            }else if (direction == Direction::TURN_DOWN){
                 return  Orientation::DOWN;
+            }else{
+                return curr_orientation;
             }
         }else{
             return curr_orientation;
