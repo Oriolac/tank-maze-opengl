@@ -106,14 +106,14 @@ public:
             if (direction == Direction::STOPPED &&
                 (next_direction == Direction::TURN_RIGHT || next_direction == Direction::TURN_LEFT
                  || next_direction == Direction::TURN_UP || next_direction == Direction::TURN_DOWN)) {
-                printf("direaction: %s", ToString(new_direction));
-                printf("orientation: %s", ToString(orientation));
                 direction = next_direction;
                 calculate_velocity_rotation();
                 orientation = get_new_orientation(direction, orientation);
                 time_remaining_rotation = time_remain();
                 next_direction = Direction::STOPPED;
             } else if (next_direction == Direction::FORWARD && direction == Direction::STOPPED) {
+                printf("direaction: %s", ToString(next_direction));
+                printf("orientation: %s", ToString(orientation));
                 calculate_velocity_and_next_tile();
                 time_remaining_movement = time_remain();
                 direction = new_direction;
