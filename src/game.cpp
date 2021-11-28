@@ -267,7 +267,10 @@ void idle() {
         context->integrate(context->getEnemyCharacter(), t - last_t);
         last_t = t;
     }
-    context->move_enemy(static_cast<Direction>(rand() % 3));
+    int num = rand() % 20;
+    if (num == 7){
+        context->move_enemy(static_cast<Direction>(rand() % 5));
+    }
     glutPostRedisplay();
 }
 

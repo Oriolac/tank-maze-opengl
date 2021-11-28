@@ -11,7 +11,7 @@ void Context::move_main(Direction direction) {
     if (direction == Direction::FORWARD && main_character->getDirection() == Direction::STOPPED)
         return;
 
-    if (direction != Direction::FORWARD || check_can_go_forward(getMainCharacter()))
+    if (direction != Direction::FORWARD  || check_can_go_forward(getMainCharacter()))
         main_character->move(direction);
 }
 
@@ -67,8 +67,6 @@ void Context::integrate(Character *pCharacter, int i) {
     } else {
         pCharacter->integrate(i);
     }
-
-
 }
 
 bool Context::check_can_go_forward(Character *pCharacter) {
