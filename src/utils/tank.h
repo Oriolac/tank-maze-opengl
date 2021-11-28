@@ -13,7 +13,7 @@ class Tank{
         static void drawWheels(int size_x, int size_y, int size_z);
         static void drawBase(int size_x, int size_y, int size_z, float color[3]);
         static void drawCavin(int size_x, int size_y, int size_z, float color[3]);
-        static void drawCannon(int size_x, int size_y, int size_z);
+        static void drawCannon(int size_x, int size_y, int size_z, float color[]);
 };
 
 

@@ -146,13 +146,12 @@ void display() {
 }
 
 void characters_display() {
-    context->getMainCharacter()->draw(COLORTUP_MAIN_FACE_VERTEX, COLORTUP_MAIN_BACK_VERTEX);
-    context->getEnemyCharacter()->draw(COLORTUP_ENEMY_FACE_VERTEX, COLORTUP_ENEMY_BACK_VERTEX);
+    context->getMainCharacter()->draw(COLORTUP_MAIN_FACE_VERTEX);
+    context->getEnemyCharacter()->draw(COLORTUP_ENEMY_FACE_VERTEX);
 }
 
 void screen_display() {
     float scale = 0.2;
-    glColor3f(0.0, 0.0, 0.0);
     glMatrixMode(GL_PROJECTION);
     glPushMatrix();
     glLoadIdentity();
@@ -183,15 +182,10 @@ void screen_display() {
 
 void ambient_light_display() {
     GLfloat position[4];
-    position[0] = 0.1;
-    position[1] = 0.1;
-    position[2] = 0.1;
-    position[3] = 1;
-    glLightfv(GL_LIGHT0, GL_POINT, position);
     GLfloat color[4];
-    color[0] = 0.1;
-    color[1] = 0.1;
-    color[2] = 0.1;
+    color[0] = 0.3;
+    color[1] = 0.3;
+    color[2] = 0.3;
     color[3] = 1;
     glLightfv(GL_LIGHT0, GL_AMBIENT, color);
     glEnable(GL_LIGHT0);
@@ -203,11 +197,7 @@ void maze_display() {
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
     create_position_observer(anglealpha, anglebeta, 300);
-    GLfloat material[4];
-    material[0] = 0.5;
-    material[1] = 0.5;
-    material[2] = 0.5;
-    material[3] = 0.5;
+    GLfloat material[4] = {1, 1, 1, 1};
     glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, material);
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
@@ -222,10 +212,6 @@ void maze_display() {
             addPath(i, j, COLOR_PATH, FLOOR);
         }
     }
-    pair<int, int> initial_pos = graph->get_main_coords();
-    addPath(initial_pos.first, initial_pos.second, COLOR_MAIN_CHARACTER_INITIAL_POS, FLOOR + 0.1);
-    pair<int, int> last_pos = graph->get_enemy_coords();
-    addPath(last_pos.first, last_pos.second, COLOR_ENEMY_CHARACTER_LAST_POS, FLOOR + 0.1);
 }
 
 void create_position_observer(int alpha, int beta, int radi) {
@@ -313,12 +299,6 @@ void addSquare(int i, int j, struct Color color, int height) {
     glPolygonMode(GL_FRONT, GL_FILL);
     glColor3f(color.red, color.green, color.blue);
     glBindTexture(GL_TEXTURE_2D, TEXTURE_STONE);
-    GLfloat material[4];
-    material[0] = 0.5;
-    material[1] = 0.5;
-    material[2] = 0.5;
-    material[3] = 0.5;
-    glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, material);
 
     glEnable(GL_TEXTURE_2D);
     glBegin(GL_QUADS);

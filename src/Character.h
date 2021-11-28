@@ -10,10 +10,6 @@
 
 
 #define COLOR_ARG_FACE float redF, float greenF, float blueF
-#define COLOR_ARG_BACK float redB, float greenB, float blueB
-#define COLOR_PARAM_FACE redF, greenF, blueF
-#define COLOR_PARAM_BACK redB, greenB, blueB
-#define HEIGHT_TANK 10.0
 
 
 enum class Direction {
@@ -228,7 +224,7 @@ public:
 
     [[nodiscard]] virtual int time_remain() const = 0;
 
-    void draw(COLOR_ARG_FACE, COLOR_ARG_BACK) {
+    void draw(COLOR_ARG_FACE) {
         update_state();
         float colors[3] = {redF, greenF, blueF};
         Tank::drawTank(tile_side_length, tile_side_length, tile_side_length, colors, x, y, currentDegree);

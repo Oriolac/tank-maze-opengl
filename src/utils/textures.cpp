@@ -1,14 +1,17 @@
 #include <GL/glut.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <math.h>
+#include "textures.h"
 #include "jpeglib.h"
 
 #define TEXTURE_STONE 1
 #define TEXTURE_GRASS 2
 
-void ReadJPEG(char *filename, unsigned char **image, int *width, int *height);
-void LoadTexture(char *filename, int dim);
+void setMaterial(const float *color) {
+    GLfloat vec[] = {color[0], color[1], color[2], 1};
+    //glColor3f(vec[0], vec[1], vec[2]);
+    glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, vec);
+}
 
 void ReadJPEG(const char *filename, unsigned char **image, int *width, int *height) {
     struct jpeg_decompress_struct cinfo;
@@ -78,7 +81,7 @@ void LoadTexture(const char *filename, int dim) {
 
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
+    glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, dim, dim, 0, GL_RGB, GL_UNSIGNED_BYTE, buffer2);
 
     free(buffer);
