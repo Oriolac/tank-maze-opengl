@@ -101,21 +101,29 @@ public:
     };
 
     void move(Direction new_direction) {
-        next_direction = new_direction;
-        if (direction == Direction::STOPPED &&
-            (next_direction == Direction::TURN_RIGHT || next_direction == Direction::TURN_LEFT
-            || next_direction == Direction::TURN_UP ||  next_direction == Direction::TURN_DOWN)) {
-
-            direction = next_direction;
-            calculate_velocity_rotation();
-            orientation = get_new_orientation(direction, orientation);
-            time_remaining_rotation = time_remain();
-            next_direction = Direction::STOPPED;
-        } else if (next_direction == Direction::FORWARD && direction == Direction::STOPPED) {
-            calculate_velocity_and_next_tile();
-            time_remaining_movement = time_remain();
-            direction = new_direction;
+        if(!is_same_direction(new_direction, orientation) && !is_inverse(new_direction, orientation)){
+            next_direction = new_direction;
+            if (direction == Direction::STOPPED &&
+                (next_direction == Direction::TURN_RIGHT || next_direction == Direction::TURN_LEFT
+                 || next_direction == Direction::TURN_UP || next_direction == Direction::TURN_DOWN)) {
+                direction = next_direction;
+                calculate_velocity_rotation();
+                orientation = get_new_orientation(direction, orientation);
+                time_remaining_rotation = time_remain();
+                next_direction = Direction::STOPPED;
+            } else if (next_direction == Direction::FORWARD && direction == Direction::STOPPED) {
+                printf("direaction: %s", ToString(next_direction));
+                printf("orientation: %s", ToString(orientation));
+                calculate_velocity_and_next_tile();
+                time_remaining_movement = time_remain();
+                direction = new_direction;
+            }
         }
+    }
+
+    bool is_same_direction(Direction direction, Orientation orientation){
+        return (direction == Direction::TURN_UP && orientation == Orientation::UP) || (direction == Direction::TURN_DOWN && orientation == Orientation::DOWN)
+        || (direction == Direction::TURN_RIGHT && orientation == Orientation::RIGHT)  || (direction == Direction::TURN_LEFT && orientation == Orientation::LEFT);
     }
 
     bool is_inverse(Direction direction, Orientation curr_orientation){
