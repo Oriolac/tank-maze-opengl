@@ -67,14 +67,13 @@ bool EnemyCharacter::isMainCharacter() {
 }
 
 
-
 void Character::drawLight() {
     std::vector<GLfloat> orientation = this->getLightDirection();
     GLfloat lightOrientation[] = {orientation[0], orientation[1], orientation[2]};
     glLightfv(this->light, GL_SPOT_DIRECTION, lightOrientation); // direction
 
-    glLightf(light, GL_SPOT_CUTOFF, 40); // degrees
-    glLightf(light, GL_SPOT_EXPONENT, 10);
+    glLightf(light, GL_SPOT_CUTOFF, 50); // degrees
+    glLightf(light, GL_SPOT_EXPONENT, 20);
 
     pair<int, int> coords = this->getCoords();
     float position[4];
@@ -84,8 +83,8 @@ void Character::drawLight() {
     position[2] = 1;
     position[3] = 1;
     glLightfv(light, GL_POSITION, position);
-    GLfloat color[] = {0.8,0.8,0.8,1};
-    glLightfv(light, GL_DIFFUSE, color);
+    GLfloat color[] = {1,1,1,1};
+    glLightfv(light, GL_AMBIENT, color);
 
     glEnable(light);
 }

@@ -141,7 +141,7 @@ void config_opengl(int &argc, char **argv) {
 
 void display() {
     glClearColor(BACKGROUND_COLOR);
-
+    glNormal3f(0,0,-1);
     maze_display();
     characters_display();
     screen_display();
@@ -207,7 +207,7 @@ void maze_display() {
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
     create_position_observer(anglealpha, anglebeta, 300);
-    GLfloat material[4] = {1, 1, 1, 1};
+    GLfloat material[4] = {0.7, 0.7, 0.7, 1};
     glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, material);
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
@@ -307,9 +307,7 @@ void idle() {
 void addSquare(int i, int j, struct Color color, int height) {
     glMatrixMode(GL_MODELVIEW);
     glPolygonMode(GL_FRONT, GL_FILL);
-    glColor3f(color.red, color.green, color.blue);
     glBindTexture(GL_TEXTURE_2D, TEXTURE_STONE);
-
     glEnable(GL_TEXTURE_2D);
     glBegin(GL_QUADS);
     glVertex3f(i * WIDTH / COLUMNS, j * HEIGHT / ROWS, height);
