@@ -74,17 +74,16 @@ void Character::drawLight() {
 
     glLightf(light, GL_SPOT_CUTOFF, 50); // degrees
     glLightf(light, GL_SPOT_EXPONENT, 20);
+    glLightf(light, GL_CONSTANT_ATTENUATION, 0.3);
 
-    pair<int, int> coords = this->getCoords();
     float position[4];
-    float plusY = orientation[1] == 1 ? 45: 0;
     position[0] = x + 20;
     position[1] = y + 20;
     position[2] = 1;
     position[3] = 1;
     glLightfv(light, GL_POSITION, position);
     GLfloat color[] = {1,1,1,1};
-    glLightfv(light, GL_AMBIENT, color);
+    glLightfv(light, GL_DIFFUSE, color);
 
     glEnable(light);
 }

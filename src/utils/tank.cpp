@@ -12,7 +12,7 @@
 void Tank::drawTank(int size_x, int size_y, int size_z, float color[3], float x_pos, float y_pos, float current_degreee){
     setMaterial(color);
     glPushMatrix();
-    glTranslatef(x_pos, y_pos, 0);
+    glTranslatef(x_pos, y_pos, 20);
     glTranslatef(size_x / 2, size_y / 2, 0);
     glRotatef(current_degreee,0, 0, 1);
     glTranslatef(-size_x / 2, -size_y / 2, 0);

@@ -16,7 +16,7 @@
 #define PI 3.1416
 #define BACKGROUND_COLOR 0.3, 0.3, 0.5, 0.0
 
-#define FLOOR 0
+#define FLOOR 10
 std::shared_ptr<Context> context;
 std::shared_ptr<GraphInterface> graph;
 int COLUMNS;
@@ -141,7 +141,7 @@ void config_opengl(int &argc, char **argv) {
 
 void display() {
     glClearColor(BACKGROUND_COLOR);
-    glNormal3f(0,0,-1);
+    glNormal3f(0, 0, -1);
     maze_display();
     characters_display();
     screen_display();
@@ -192,11 +192,9 @@ void screen_display() {
 }
 
 void ambient_light_display() {
-    GLfloat color[4];
-    color[0] = 0.1;
-    color[1] = 0.1;
-    color[2] = 0.1;
-    color[3] = 1;
+    GLfloat color[4] = {0.1, 0.1, 0.1, 1};
+    GLfloat vec[4] = {100, 100, 1000};
+    glLightfv (GL_LIGHT0, GL_POSITION, vec);
     glLightfv(GL_LIGHT0, GL_AMBIENT, color);
     glEnable(GL_LIGHT0);
 }
@@ -208,7 +206,7 @@ void maze_display() {
     glLoadIdentity();
     create_position_observer(anglealpha, anglebeta, 300);
     GLfloat material[4] = {0.7, 0.7, 0.7, 1};
-    glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, material);
+    glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, material);
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
     glOrtho(-WIDTH * 2 / 3, WIDTH * 2 / 3, -HEIGHT * 2 / 3, HEIGHT * 2 / 3, -10000, 20000);
@@ -217,7 +215,7 @@ void maze_display() {
         i = coords->first;
         j = coords->second;
         if (graph->is_wall(tile_count)) {
-            addSquare(i, j, COLOR_WALL, 20);
+            addSquare(i, j, COLOR_WALL, 40);
         } else {
             addPath(i, j, COLOR_PATH, FLOOR);
         }
@@ -309,7 +307,8 @@ void addSquare(int i, int j, struct Color color, int height) {
     glPolygonMode(GL_FRONT, GL_FILL);
     glBindTexture(GL_TEXTURE_2D, TEXTURE_STONE);
     glEnable(GL_TEXTURE_2D);
-    glBegin(GL_QUADS);
+    glBegin(GL_QUADS); // Up
+    glNormal3f(0, 0, -1);
     glVertex3f(i * WIDTH / COLUMNS, j * HEIGHT / ROWS, height);
     glTexCoord2f(1.0, 0.0);
     glVertex3f((i + 1) * WIDTH / COLUMNS, j * HEIGHT / ROWS, height);
@@ -319,8 +318,7 @@ void addSquare(int i, int j, struct Color color, int height) {
     glVertex3f(i * WIDTH / COLUMNS, (j + 1) * HEIGHT / ROWS, height);
     glEnd();
 
-    glColor3f(0, 0, 0);
-    glBegin(GL_QUADS);
+    glBegin(GL_QUADS); // Down
     glTexCoord2f(0.0, 0.0);
     glVertex3f(i * WIDTH / COLUMNS, j * HEIGHT / ROWS, FLOOR);
     glTexCoord2f(0.0, 1.0);
@@ -331,7 +329,8 @@ void addSquare(int i, int j, struct Color color, int height) {
     glVertex3f((i + 1) * WIDTH / COLUMNS, j * HEIGHT / ROWS, FLOOR);
     glEnd();
 
-    glBegin(GL_QUADS);
+    glBegin(GL_QUADS); // Back Wall
+    glNormal3f(0, 0.1, 0);
     glTexCoord2f(0.0, 0.0);
     glVertex3f(i * WIDTH / COLUMNS, ((j + 1) * HEIGHT / ROWS), height);
     glTexCoord2f(0.0, 1.0);
@@ -342,7 +341,8 @@ void addSquare(int i, int j, struct Color color, int height) {
     glVertex3f(i * WIDTH / COLUMNS, (j + 1) * HEIGHT / ROWS, FLOOR);
     glEnd();
 
-    glBegin(GL_QUADS);
+    glBegin(GL_QUADS); // Front Wall
+    glNormal3f(0, -0.1, 0.1);
     glTexCoord2f(0.0, 0.0);
     glVertex3f(i * WIDTH / COLUMNS, j * HEIGHT / ROWS, FLOOR);
     glTexCoord2f(1.0, 0.0);
@@ -353,7 +353,8 @@ void addSquare(int i, int j, struct Color color, int height) {
     glVertex3f(i * WIDTH / COLUMNS, j * HEIGHT / ROWS, height);
     glEnd();
 
-    glBegin(GL_QUADS);
+    glBegin(GL_QUADS); // Left Wall
+    glNormal3f(-0.1, 0, 0.1);
     glTexCoord2f(0.0, 0.0);
     glVertex3f(i * WIDTH / COLUMNS, j * HEIGHT / ROWS, height);
     glTexCoord2f(0.0, 1.0);
@@ -364,7 +365,8 @@ void addSquare(int i, int j, struct Color color, int height) {
     glVertex3f(i * WIDTH / COLUMNS, j * HEIGHT / ROWS, FLOOR);
     glEnd();
 
-    glBegin(GL_QUADS);
+    glBegin(GL_QUADS); // Right Wall
+    glNormal3f(+0.1, 0,0);
     glTexCoord2f(0.0, 0.0);
     glVertex3f((i + 1) * WIDTH / COLUMNS, j * HEIGHT / ROWS, height);
     glTexCoord2f(0.0, 1.0);
@@ -376,15 +378,15 @@ void addSquare(int i, int j, struct Color color, int height) {
     glEnd();
 
     glDisable(GL_TEXTURE_2D);
+    glNormal3f(0, 0, -1);
 }
 
 void addPath(int i, int j, Color color, float height) {
     glMatrixMode(GL_MODELVIEW);
-    glPolygonMode(GL_FRONT, GL_FILL);
-    glColor3f(color.red, color.green, color.blue);
     glBindTexture(GL_TEXTURE_2D, TEXTURE_GRASS);
     glEnable(GL_TEXTURE_2D);
     glBegin(GL_QUADS);
+    glNormal3f(0, 0, -1);
     glTexCoord2f(0.0, 0.0);
     glVertex3f(i * WIDTH / COLUMNS, j * HEIGHT / ROWS, height);
     glTexCoord2f(1, 0.0);
@@ -395,15 +397,6 @@ void addPath(int i, int j, Color color, float height) {
     glVertex3f(i * WIDTH / COLUMNS, (j + 1) * HEIGHT / ROWS, height);
     glEnd();
 
-    glBegin(GL_QUADS);
-    glTexCoord2f(0.0, 0.0);
-    glVertex3f(i * WIDTH / COLUMNS, j * HEIGHT / ROWS, height);
-    glTexCoord2f(0.0, 1.0);
-    glVertex3f(i * WIDTH / COLUMNS, (j + 1) * HEIGHT / ROWS, height);
-    glTexCoord2f(1.0, 1.0);
-    glVertex3f((i + 1) * WIDTH / COLUMNS, (j + 1) * HEIGHT / ROWS, height);
-    glTexCoord2f(1.0, 0.0);
-    glVertex3f((i + 1) * WIDTH / COLUMNS, j * HEIGHT / ROWS, height);
-    glEnd();
+
     glDisable(GL_TEXTURE_2D);
 }
