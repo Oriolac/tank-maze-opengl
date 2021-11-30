@@ -72,7 +72,7 @@ int main(int argc, char **argv) {
         graph->print();
     MainCharacter main_character = MainCharacter(graph->get_main_coords(), SIDE_LENGTH);
     EnemyCharacter enemy_character = EnemyCharacter(graph->get_enemy_coords(), SIDE_LENGTH);
-    Context new_cont = Context(graph, &main_character, &enemy_character);
+    Context new_cont = Context(graph, &main_character, &enemy_character, SIDE_LENGTH);
     context = make_shared<Context>(new_cont);
     config_opengl(argc, argv);
 }

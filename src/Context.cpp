@@ -107,6 +107,7 @@ void Context::integrateBullet(int i) {
             remove_shoot();
         } else if (has_shoot_enemy(bulletCoords)) {
             enemy_character->die_and_go_home();
+            enemy_character->set_character_fields(graph->get_enemy_coords(), this->tile_side_length);
             remove_shoot();
         } else {
             bullet->go_on();

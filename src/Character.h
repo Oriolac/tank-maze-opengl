@@ -80,23 +80,27 @@ protected:
     GLenum light;
 public:
     Character(pair<int, int> coords, int tile_side_length) {
+        set_character_fields(coords, tile_side_length);
+        light = GL_LIGHT1;
+        isDead = false;
+        direction = Direction::FORWARD;
+        orientation = Orientation::DOWN;
+        next_direction = Direction::STOPPED;
+    }
+
+    void set_character_fields(const pair<int, int> &coords, int tile_side_length) {
         xTile = coords.first;
         yTile = coords.second;
         x = coords.first * tile_side_length;
         y = coords.second * tile_side_length;
-        this->tile_side_length = tile_side_length;
+        Character::tile_side_length = tile_side_length;
         variance = tile_side_length / 5;
         update_state();
-        direction = Direction::FORWARD;
-        orientation = Orientation::DOWN;
-        next_direction = Direction::STOPPED;
         time_remaining_movement = 0;
         time_remaining_rotation = 0;
         vX = 0;
         vY = 0;
         velRotate = 0;
-        light = GL_LIGHT1;
-        isDead = false;
     }
 
     void update_state() {
@@ -228,6 +232,11 @@ public:
             }
             direction = Direction::STOPPED;
             return true;
+        }
+        if (isDead) {
+            this->time_death_remain -= t;
+            if (this->time_death_remain <= 0)
+                isDead = false;
         }
         return false;
     }

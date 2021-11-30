@@ -33,7 +33,7 @@ Bullet::Bullet(int x, int y, int tile_side_length, Orientation orientation) {
 }
 
 int Bullet::time_remain() {
-    return 100;
+    return 50;
 }
 
 bool Bullet::integrate(int t) {
@@ -56,6 +56,8 @@ void Bullet::go_on() {
 }
 
 void Bullet::draw() {
+    float color[] = {0.2,0.2,1};
+    setMaterial(color);
     glPushMatrix();
     GLUquadricObj *quadratic;
     glTranslatef(x, y, 20);

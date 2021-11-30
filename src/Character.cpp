@@ -72,7 +72,6 @@ void EnemyCharacter::die_and_go_home() {
     time_death_remain = TIME_REMAINING_DEATH;
     isDead = true;
     glDisable(this->light);
-    printf("ENEMY SHOT");
 }
 
 

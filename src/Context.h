@@ -15,12 +15,14 @@ private:
     MainCharacter *main_character;
     EnemyCharacter *enemy_character;
     std::shared_ptr<Bullet> bullet;
+    int tile_side_length;
 public:
-    Context(std::shared_ptr<GraphInterface> graphInt, MainCharacter *main_char, EnemyCharacter *enemyCharacter) {
+    Context(std::shared_ptr<GraphInterface> graphInt, MainCharacter *main_char, EnemyCharacter *enemyCharacter, int side_length) {
         this->graph = graphInt;
         this->main_character = main_char;
         this->enemy_character = enemyCharacter;
         bullet = nullptr;
+        this->tile_side_length = side_length;
     }
 
 
@@ -51,6 +53,7 @@ public:
     void drawBullet();
 
     bool has_shoot_enemy(pair<int, int> tile);
+
 };
 
 
