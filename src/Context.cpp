@@ -1,17 +1,17 @@
 //
 // Created by oriol on 10/6/21.
 //
-#include <concepts>
 #include <memory>
 
 #include "Context.h"
 #include "Character.h"
+#include "Bullet.h"
 
 void Context::move_main(Direction direction) {
     if (direction == Direction::FORWARD && main_character->getDirection() == Direction::STOPPED)
         return;
 
-    if (direction != Direction::FORWARD  || check_can_go_forward(getMainCharacter()))
+    if (direction != Direction::FORWARD || check_can_go_forward(getMainCharacter()))
         main_character->move(direction);
 }
 
@@ -78,36 +78,45 @@ bool Context::check_can_go_forward(Character *pCharacter) {
 }
 
 void Context::shoot() {
+    if (bullet != nullptr)
+        return;
     Orientation orientation = main_character->getOrientation();
-    int addX = 0;
-    int addY = 0;
-    switch (orientation) {
-        case Orientation::UP:
-            addY = 1;
-            break;
-        case Orientation::DOWN:
-            addY = -1;
-            break;
-        case Orientation::LEFT:
-            addX = -1;
-            break;
-        case Orientation::RIGHT:
-            addX = 1;
-            break;
-    }
-    bool isPath = true;
-    pair<int, int> new_pos = main_character->getCoords();
-    while (isPath && has_shoot_enemy(new_pos)) {
-        pair<int, int> new_pos = pair<int, int>(new_pos.first + addX, new_pos.second + addY);
-        isPath = !this->graph->is_wall(new_pos.first, new_pos.second);
-    }
-    if (isPath) {
-        enemy_character->go_home();
-    }
+    std::pair<int, int> coord = main_character->getCoords();
+    Bullet newBullet = Bullet(coord.first, coord.second, main_character->tile_side_length, orientation);
+    bullet = make_shared<Bullet>(newBullet);
+    printf("SHOOT\n");
 }
+
 
 bool Context::has_shoot_enemy(pair<int, int> tile) {
     pair<int, int> enemy = enemy_character->getCoords();
     return enemy == tile;
+}
+
+void Context::remove_shoot() {
+    bullet = nullptr;
+}
+
+void Context::integrateBullet(int i) {
+    if (bullet == nullptr)
+        return;
+    bool hasFinished = bullet->integrate(i);
+    if (hasFinished) {
+        std::pair<int, int> bulletCoords = bullet->getCoords();
+        if (graph->is_wall(bulletCoords.first, bulletCoords.second)) {
+            remove_shoot();
+        } else if (has_shoot_enemy(bulletCoords)) {
+            printf("ENEMY SHOT");
+        } else {
+            bullet->go_on();
+        }
+    }
+}
+
+
+void Context::drawBullet() {
+    if (bullet == nullptr)
+        return;
+    bullet->draw();
 }
 

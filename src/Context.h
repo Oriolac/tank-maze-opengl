@@ -3,6 +3,7 @@
 //
 
 #include <memory>
+#include "Bullet.cpp"
 
 #ifndef TANK_MAZE_CONTEXT_H
 #define TANK_MAZE_CONTEXT_H
@@ -13,11 +14,13 @@ private:
     std::shared_ptr<GraphInterface> graph;
     MainCharacter *main_character;
     EnemyCharacter *enemy_character;
+    std::shared_ptr<Bullet> bullet;
 public:
     Context(std::shared_ptr<GraphInterface> graphInt, MainCharacter *main_char, EnemyCharacter *enemyCharacter) {
         this->graph = graphInt;
         this->main_character = main_char;
         this->enemy_character = enemyCharacter;
+        bullet = nullptr;
     }
 
 
@@ -40,6 +43,12 @@ public:
     bool check_can_go_forward(Character *pCharacter);
 
     void shoot();
+
+    void remove_shoot();
+
+    void integrateBullet(int i);
+
+    void drawBullet();
 
     bool has_shoot_enemy(pair<int, int> tile);
 };

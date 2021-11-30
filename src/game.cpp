@@ -153,6 +153,7 @@ void display() {
 void characters_display() {
     context->getMainCharacter()->draw(COLORTUP_MAIN_FACE_VERTEX);
     context->getEnemyCharacter()->draw(COLORTUP_ENEMY_FACE_VERTEX);
+    context->drawBullet();
 }
 
 void characters_light() {
@@ -269,6 +270,10 @@ void keyboard(unsigned char c, int x, int y) {
         case 'E':
             context->shoot();
             break;
+        case 'r':
+        case 'R':
+            context->remove_shoot();
+            break;
         case 'i':
             if (anglebeta <= (90 - 4))
                 anglebeta = (anglebeta + 3);
@@ -297,6 +302,7 @@ void idle() {
     } else {
         context->integrate(context->getMainCharacter(), t - last_t);
         context->integrate(context->getEnemyCharacter(), t - last_t);
+        context->integrateBullet(t - last_t);
         last_t = t;
     }
     int num = rand() % 100;

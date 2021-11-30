@@ -66,7 +66,6 @@ protected:
     double vX, vY;
     double velRotate;
     double currentDegree;
-    int tile_side_length;
     double x_start;
     double x_finish;
     Direction direction;
@@ -255,6 +254,8 @@ public:
     Direction nextDirection();
 
     std::vector<GLfloat> getLightDirection();
+
+    int tile_side_length;
 };
 
 class MainCharacter : public Character {
