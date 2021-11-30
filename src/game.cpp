@@ -15,6 +15,7 @@
 
 #define PI 3.1416
 #define BACKGROUND_COLOR 0.3, 0.3, 0.5, 0.0
+#define TIME_MAZE 10.0
 
 #define FLOOR 10
 std::shared_ptr<Context> context;
@@ -25,8 +26,11 @@ int WIDTH;
 int HEIGHT;
 int anglebeta = 0;
 int anglealpha = 0;
-double time_maze = 60;
+double time_maze = TIME_MAZE;
 double time_left = time_maze;
+bool mustPrint = false;
+double additional_time = 0;
+bool mustInit = false;
 std::shared_ptr<Dimensions> dimensions;
 
 int last_t = 0;
@@ -57,6 +61,10 @@ void addPath(int i, int j, Color color, float height);
 
 void ambient_light_display();
 
+void initGraph(int argc, char **argv);
+
+void init();
+
 int main(int argc, char **argv) {
     if (argc < 4 || argc > 5) {
         printf("Usage:\n\t./game [<rows>=20 <cols>=20 --func={dfs, heur} [--print]]\n");
@@ -66,15 +74,26 @@ int main(int argc, char **argv) {
     anglebeta = -2;
     Dimensions new_dimensions = getDimensions(argc, argv);
     dimensions = make_shared<Dimensions>(new_dimensions);
-    bool mustPrint = get_opt_args(argc, argv);
+    mustPrint = get_opt_args(argc, argv);
     graph->start();
-    if (mustPrint)
-        graph->print();
     MainCharacter main_character = MainCharacter(graph->get_main_coords(), SIDE_LENGTH);
     EnemyCharacter enemy_character = EnemyCharacter(graph->get_enemy_coords(), SIDE_LENGTH);
     Context new_cont = Context(graph, &main_character, &enemy_character, SIDE_LENGTH);
     context = make_shared<Context>(new_cont);
+    if (mustPrint)
+        graph->print();
     config_opengl(argc, argv);
+}
+
+void init() {
+    GraphDFS graphDfs = GraphDFS(dimensions->cols, dimensions->rows);
+    graph = make_shared<GraphDFS>(graphDfs);
+    graph->start();
+    MainCharacter main_character = MainCharacter(graph->get_main_coords(), SIDE_LENGTH);
+    EnemyCharacter enemy_character = EnemyCharacter(graph->get_enemy_coords(), SIDE_LENGTH);
+    Context new_cont = Context(graph, &main_character, &enemy_character, SIDE_LENGTH);
+    context = make_shared<Context>(new_cont);
+    additional_time += TIME_MAZE - time_left;
 }
 
 bool get_opt_args(int argc, char *const *argv) {
@@ -125,11 +144,9 @@ void config_opengl(int &argc, char **argv) {
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_TEXTURE_2D);
     glEnable(GL_LIGHTING);
-
     glutDisplayFunc(display);
     glutKeyboardFunc(keyboard);
     glutIdleFunc(idle);
-
     glBindTexture(GL_TEXTURE_2D, TEXTURE_STONE);
     LoadTexture(std::string("textures/stone.jpeg").c_str(), 512);
     glBindTexture(GL_TEXTURE_2D, TEXTURE_GRASS);
@@ -140,6 +157,10 @@ void config_opengl(int &argc, char **argv) {
 
 
 void display() {
+    if (mustInit) {
+        init();
+        mustInit = false;
+    }
     glClearColor(BACKGROUND_COLOR);
     glNormal3f(0, 0, -1);
     maze_display();
@@ -154,7 +175,7 @@ void characters_display() {
     context->getMainCharacter()->draw(COLORTUP_MAIN_FACE_VERTEX);
     context->getEnemyCharacter()->draw(COLORTUP_ENEMY_FACE_VERTEX);
     context->drawBullet();
-    float color[] = {1,1,1};
+    float color[] = {1, 1, 1};
     setMaterial(color);
 }
 
@@ -197,7 +218,7 @@ void screen_display() {
 void ambient_light_display() {
     GLfloat color[4] = {0.1, 0.1, 0.1, 1};
     GLfloat vec[4] = {100, 100, 1000};
-    glLightfv (GL_LIGHT0, GL_POSITION, vec);
+    glLightfv(GL_LIGHT0, GL_POSITION, vec);
     glLightfv(GL_LIGHT0, GL_AMBIENT, color);
     glEnable(GL_LIGHT0);
 }
@@ -274,7 +295,7 @@ void keyboard(unsigned char c, int x, int y) {
             break;
         case 'r':
         case 'R':
-            context->remove_shoot();
+            init();
             break;
         case 'i':
             if (anglebeta <= (90 - 4))
@@ -298,7 +319,7 @@ void keyboard(unsigned char c, int x, int y) {
 
 void idle() {
     int t = glutGet(GLUT_ELAPSED_TIME);
-    time_left = time_maze - (((double) t) / (1000));
+    time_left = time_maze - (((double) t) / (1000)) + additional_time;
     if (last_t == 0) {
         last_t = t;
     } else {
@@ -312,8 +333,7 @@ void idle() {
         context->move_enemy(static_cast<Direction>(rand() % 5));
     }
     if (time_left < 0) {
-        time_left = time_maze;
-
+        mustInit = true;
     }
     glutPostRedisplay();
 }
@@ -382,7 +402,7 @@ void addSquare(int i, int j, struct Color color, int height) {
     glEnd();
 
     glBegin(GL_QUADS); // Right Wall
-    glNormal3f(+0.1, 0,0);
+    glNormal3f(+0.1, 0, 0);
     glTexCoord2f(0.0, 0.0);
     glVertex3f((i + 1) * WIDTH / COLUMNS, j * HEIGHT / ROWS, height);
     glTexCoord2f(0.0, 1.0);
