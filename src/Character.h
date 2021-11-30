@@ -7,6 +7,8 @@
 #define TIME_REMAINING_MAIN 200
 #define TIME_REMAINING_ENEMY 200
 
+#define TIME_REMAINING_DEATH 2000
+
 #ifndef TANK_MAZE_CHARACTER_H
 #define TANK_MAZE_CHARACTER_H
 
@@ -73,6 +75,8 @@ protected:
     int time_remaining_movement;
     int time_remaining_rotation;
     Direction next_direction;
+    bool isDead;
+    int time_death_remain;
     GLenum light;
 public:
     Character(pair<int, int> coords, int tile_side_length) {
@@ -92,6 +96,7 @@ public:
         vY = 0;
         velRotate = 0;
         light = GL_LIGHT1;
+        isDead = false;
     }
 
     void update_state() {
@@ -232,6 +237,8 @@ public:
     [[nodiscard]] virtual int time_remain() const = 0;
 
     void draw(COLOR_ARG_FACE) {
+        if (isDead)
+            return;
         update_state();
         float colors[3] = {redF, greenF, blueF};
         Tank::drawTank(tile_side_length, tile_side_length, tile_side_length, colors, x, y, currentDegree);
@@ -279,7 +286,8 @@ public:
 
     bool isMainCharacter() override;
 
-    void go_home();
+    void die_and_go_home();
+
 };
 
 #endif //TANK_MAZE_CHARACTER_H

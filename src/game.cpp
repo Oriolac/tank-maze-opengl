@@ -154,6 +154,8 @@ void characters_display() {
     context->getMainCharacter()->draw(COLORTUP_MAIN_FACE_VERTEX);
     context->getEnemyCharacter()->draw(COLORTUP_ENEMY_FACE_VERTEX);
     context->drawBullet();
+    float color[] = {1,1,1};
+    setMaterial(color);
 }
 
 void characters_light() {

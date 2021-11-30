@@ -60,18 +60,25 @@ EnemyCharacter::EnemyCharacter(pair<int, int> coords, int tile_side_length) : Ch
     orientation = Orientation::UP;
     currentDegree = 90;
     light = GL_LIGHT2;
+    isDead = false;
+    time_death_remain = TIME_REMAINING_DEATH;
 }
 
 bool EnemyCharacter::isMainCharacter() {
     return false;
 }
 
-void EnemyCharacter::go_home() {
-
+void EnemyCharacter::die_and_go_home() {
+    time_death_remain = TIME_REMAINING_DEATH;
+    isDead = true;
+    glDisable(this->light);
+    printf("ENEMY SHOT");
 }
 
 
 void Character::drawLight() {
+    if (isDead)
+        return;
     std::vector<GLfloat> orientation = this->getLightDirection();
     GLfloat lightOrientation[] = {orientation[0], orientation[1], orientation[2]};
     glLightfv(this->light, GL_SPOT_DIRECTION, lightOrientation); // direction

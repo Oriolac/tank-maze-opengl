@@ -106,7 +106,8 @@ void Context::integrateBullet(int i) {
         if (graph->is_wall(bulletCoords.first, bulletCoords.second)) {
             remove_shoot();
         } else if (has_shoot_enemy(bulletCoords)) {
-            printf("ENEMY SHOT");
+            enemy_character->die_and_go_home();
+            remove_shoot();
         } else {
             bullet->go_on();
         }
