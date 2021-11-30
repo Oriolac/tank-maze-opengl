@@ -68,8 +68,6 @@ protected:
     double vX, vY;
     double velRotate;
     double currentDegree;
-    double x_start;
-    double x_finish;
     Direction direction;
     Orientation orientation;
     int time_remaining_movement;
@@ -95,18 +93,12 @@ public:
         y = coords.second * tile_side_length;
         Character::tile_side_length = tile_side_length;
         variance = tile_side_length / 5;
-        update_state();
         time_remaining_movement = 0;
         time_remaining_rotation = 0;
         vX = 0;
         vY = 0;
         velRotate = 0;
     }
-
-    void update_state() {
-        x_start = x + variance;
-        x_finish = x + tile_side_length - variance;
-    };
 
     void move(Direction new_direction) {
         if(!is_same_direction(new_direction, orientation) && !is_inverse(new_direction, orientation)  && new_direction != direction ){
@@ -248,7 +240,6 @@ public:
     void draw(COLOR_ARG_FACE) {
         if (isDead)
             return;
-        update_state();
         float colors[3] = {redF, greenF, blueF};
         Tank::drawTank(tile_side_length, tile_side_length, tile_side_length, colors, x, y, currentDegree);
     }
@@ -272,6 +263,8 @@ public:
     std::vector<GLfloat> getLightDirection();
 
     int tile_side_length;
+
+    bool is_dead();
 };
 
 class MainCharacter : public Character {

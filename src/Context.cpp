@@ -16,6 +16,8 @@ void Context::move_main(Direction direction) {
 }
 
 void Context::move_enemy(Direction direction) {
+    if (enemy_character->is_dead())
+        return;
     if (direction == Direction::FORWARD && enemy_character->getDirection() == Direction::STOPPED)
         return;
     if (direction != Direction::FORWARD || check_can_go_forward(getEnemyCharacter())) {
@@ -50,7 +52,7 @@ Context::check_can_move_if_forward(const pair<int, int> &coords, Character *pCha
     }
     can_move = can_move && !graph->is_wall(x, y);
     pair<int, int> other_coords = otherCharacter->getCoords();
-    can_move = can_move && !(x == other_coords.first && y == other_coords.second);
+    can_move = can_move && (otherCharacter->is_dead() || !(x == other_coords.first && y == other_coords.second));
     return can_move;
 }
 

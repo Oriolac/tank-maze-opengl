@@ -308,8 +308,12 @@ void idle() {
         last_t = t;
     }
     int num = rand() % 100;
-    if (num == 7) {
+    if (num == 7 && !context->getEnemyCharacter()->is_dead()) {
         context->move_enemy(static_cast<Direction>(rand() % 5));
+    }
+    if (time_left < 0) {
+        time_left = time_maze;
+
     }
     glutPostRedisplay();
 }
@@ -408,7 +412,5 @@ void addPath(int i, int j, Color color, float height) {
     glTexCoord2f(0.0, 1.0);
     glVertex3f(i * WIDTH / COLUMNS, (j + 1) * HEIGHT / ROWS, height);
     glEnd();
-
-
     glDisable(GL_TEXTURE_2D);
 }

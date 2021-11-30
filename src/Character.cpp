@@ -97,3 +97,7 @@ void Character::drawLight() {
 
     glEnable(light);
 }
+
+bool Character::is_dead() {
+    return isDead;
+}
