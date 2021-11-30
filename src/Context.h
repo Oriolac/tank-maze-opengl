@@ -38,6 +38,10 @@ public:
     bool check_can_move_if_forward(const pair<int, int> &coords, Character *pCharacter, Character *otherCharacter);
 
     bool check_can_go_forward(Character *pCharacter);
+
+    void shoot();
+
+    bool has_shoot_enemy(pair<int, int> tile);
 };
 
 

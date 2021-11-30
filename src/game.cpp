@@ -265,6 +265,10 @@ void keyboard(unsigned char c, int x, int y) {
         case 'S':
             context->move_main(Direction::TURN_DOWN);
             break;
+        case 'e':
+        case 'E':
+            context->shoot();
+            break;
         case 'i':
             if (anglebeta <= (90 - 4))
                 anglebeta = (anglebeta + 3);

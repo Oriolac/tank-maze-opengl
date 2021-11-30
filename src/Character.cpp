@@ -66,6 +66,10 @@ bool EnemyCharacter::isMainCharacter() {
     return false;
 }
 
+void EnemyCharacter::go_home() {
+
+}
+
 
 void Character::drawLight() {
     std::vector<GLfloat> orientation = this->getLightDirection();

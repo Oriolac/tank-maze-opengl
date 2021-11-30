@@ -277,6 +277,8 @@ public:
     }
 
     bool isMainCharacter() override;
+
+    void go_home();
 };
 
 #endif //TANK_MAZE_CHARACTER_H

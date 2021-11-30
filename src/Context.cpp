@@ -77,3 +77,37 @@ bool Context::check_can_go_forward(Character *pCharacter) {
     return res;
 }
 
+void Context::shoot() {
+    Orientation orientation = main_character->getOrientation();
+    int addX = 0;
+    int addY = 0;
+    switch (orientation) {
+        case Orientation::UP:
+            addY = 1;
+            break;
+        case Orientation::DOWN:
+            addY = -1;
+            break;
+        case Orientation::LEFT:
+            addX = -1;
+            break;
+        case Orientation::RIGHT:
+            addX = 1;
+            break;
+    }
+    bool isPath = true;
+    pair<int, int> new_pos = main_character->getCoords();
+    while (isPath && has_shoot_enemy(new_pos)) {
+        pair<int, int> new_pos = pair<int, int>(new_pos.first + addX, new_pos.second + addY);
+        isPath = !this->graph->is_wall(new_pos.first, new_pos.second);
+    }
+    if (isPath) {
+        enemy_character->go_home();
+    }
+}
+
+bool Context::has_shoot_enemy(pair<int, int> tile) {
+    pair<int, int> enemy = enemy_character->getCoords();
+    return enemy == tile;
+}
+
