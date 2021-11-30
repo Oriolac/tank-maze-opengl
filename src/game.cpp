@@ -15,7 +15,7 @@
 
 #define PI 3.1416
 #define BACKGROUND_COLOR 0.3, 0.3, 0.5, 0.0
-#define TIME_MAZE 10.0
+#define TIME_MAZE 50.0
 
 #define FLOOR 10
 std::shared_ptr<Context> context;
@@ -333,6 +333,11 @@ void idle() {
         context->move_enemy(static_cast<Direction>(rand() % 5));
     }
     if (time_left < 0) {
+        mustInit = true;
+    }
+    pair<int,int> mainCoords = context->getMainCharacter()->getCoords();
+    pair<int,int> enemyCoords = context->getEnemyCharacter()->getCoords();
+    if ( (mainCoords.first == COLUMNS-2 && mainCoords.second == 1) || (enemyCoords.first == 1 && enemyCoords.second == ROWS-2) ){
         mustInit = true;
     }
     glutPostRedisplay();
