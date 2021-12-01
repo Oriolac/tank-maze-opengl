@@ -216,12 +216,6 @@ public:
         } else if ((direction == Direction::TURN_UP || direction == Direction::TURN_DOWN || direction == Direction::TURN_RIGHT || direction == Direction::TURN_LEFT) &&
                    t >= this->time_remaining_rotation) {
             currentDegree = currentDegree + time_remaining_rotation * velRotate;
-/*            int noise = (int) abs(currentDegree) % 90;
-            if (noise > 45) {
-                currentDegree = (int) ((currentDegree + 45) / 90) * 90;
-            } else if (noise != 0 && noise <= 45) {
-                currentDegree = (int) ((currentDegree - 45) / 90) * 90;
-            }*/
             direction = Direction::STOPPED;
             return true;
         }
