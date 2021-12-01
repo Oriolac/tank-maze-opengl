@@ -9,7 +9,11 @@
 
 void setMaterial(const float *color) {
     GLfloat vec[] = {color[0], color[1], color[2], 1};
-    //glColor3f(vec[0], vec[1], vec[2]);
+    glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, vec);
+}
+
+void setMaterialTransp(const float *color, float transp) {
+    GLfloat vec[] = {color[0], color[1], color[2], transp};
     glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, vec);
 }
 

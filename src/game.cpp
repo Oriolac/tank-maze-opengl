@@ -15,7 +15,7 @@
 
 #define PI 3.1416
 #define BACKGROUND_COLOR 0.3, 0.3, 0.5, 0.0
-#define TIME_MAZE 50.0
+#define TIME_MAZE 60.0
 
 #define FLOOR 10
 std::shared_ptr<Context> context;
@@ -186,6 +186,7 @@ void characters_light() {
 
 
 void screen_display() {
+    glDisable(GL_LIGHTING);
     float scale = 0.2;
     glMatrixMode(GL_PROJECTION);
     glPushMatrix();
@@ -213,10 +214,11 @@ void screen_display() {
     glPopMatrix();
     glMatrixMode(GL_MODELVIEW);
     glPopMatrix();
+    glEnable(GL_LIGHTING);
 }
 
 void ambient_light_display() {
-    GLfloat color[4] = {0.1, 0.1, 0.1, 1};
+    GLfloat color[4] = {0.05, 0.05, 0.05, 1};
     GLfloat vec[4] = {100, 100, 1000};
     glLightfv(GL_LIGHT0, GL_POSITION, vec);
     glLightfv(GL_LIGHT0, GL_AMBIENT, color);
@@ -337,7 +339,9 @@ void idle() {
     }
     pair<int,int> mainCoords = context->getMainCharacter()->getCoords();
     pair<int,int> enemyCoords = context->getEnemyCharacter()->getCoords();
-    if ( (mainCoords.first == COLUMNS-2 && mainCoords.second == 1) || (enemyCoords.first == 1 && enemyCoords.second == ROWS-2) ){
+    pair<int, int> initialMainCoords = graph->get_main_coords();
+    pair<int, int> initialEnemyCoords = graph->get_enemy_coords();
+    if (mainCoords == initialEnemyCoords || enemyCoords == initialMainCoords ){
         mustInit = true;
     }
     glutPostRedisplay();

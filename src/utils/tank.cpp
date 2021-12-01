@@ -70,7 +70,8 @@ void Tank::drawBase(int size_x, int size_y, int size_z, float color[3]){
     glEnd();
 
     /*Part de Dalt*/
-    setMaterial(color);
+    float frontal_color[] = {static_cast<float>(color[0] - 0.1), static_cast<float>(color[1] - 0.1), static_cast<float>(color[2] - 0.1), 1};
+    glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, frontal_color);
     glBegin(GL_QUADS);
     glVertex3f(0, size_y / 6, 2 * size_z / 3);
     glVertex3f(0, 5 * size_y / 6, 2 * size_z / 3);

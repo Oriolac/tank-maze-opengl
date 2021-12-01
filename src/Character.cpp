@@ -40,6 +40,7 @@ bool MainCharacter::isMainCharacter() {
 }
 
 void Character::nextMoveNotForward() {
+    printf("NEXTMOVE NOT FORWARD\n");
     Direction new_direction = next_direction == Direction::FORWARD ? Direction::STOPPED : next_direction;
     this->next_direction = Direction::STOPPED;
     move(new_direction);

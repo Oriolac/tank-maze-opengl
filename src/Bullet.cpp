@@ -33,7 +33,7 @@ Bullet::Bullet(int x, int y, int tile_side_length, Orientation orientation) {
 }
 
 int Bullet::time_remain() {
-    return 50;
+    return 40;
 }
 
 bool Bullet::integrate(int t) {
